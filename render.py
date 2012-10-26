@@ -240,6 +240,29 @@ def composite(self, op, src, mask, dst, src_x, src_y, mask_x, mask_y, dst_x, dst
         height = height,
         )
 
+class CreateCursor(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(27),
+        rq.RequestLength(),
+        rq.Cursor('cid'),
+        Picture('source'),
+        rq.Card16('x'),
+        rq.Card16('y'),
+        )
+
+def create_cursor(self, source, x, y):
+    cid = self.display.allocate_resource_id()
+    CreateCursor(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        cid = cid,
+        source = source,
+        x = x,
+        y = y,
+        )
+    return cid
+
 
 def init(disp, info):
     disp.extension_add_method('display',
@@ -261,4 +284,8 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_composite',
                               composite)
+
+    disp.extension_add_method('display',
+                              'render_create_cursor',
+                              create_cursor)
 

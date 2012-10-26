@@ -44,17 +44,20 @@ for item in res.subpixels:
 depth = 32
 visual = match_visual_info(scr, depth, X.TrueColor)
 colormap = root.create_colormap(visual, X.AllocNone)
-win = root.create_window(0, 0, 50, 50, 0, depth, X.CopyFromParent, visual, colormap = colormap, background_pixel = 0xffffffff, border_pixel = 0, event_mask = X.ExposureMask)
+win = root.create_window(0, 0, 16, 16, 0, depth, X.CopyFromParent, visual, colormap = colormap, background_pixel = 0xffffffff, border_pixel = 0, event_mask = X.ExposureMask)
 win.map()
 
 while 1:
 	ev = dpy.next_event()
 	if ev.type == X.Expose:
 		gc = ev.window.create_gc(foreground = 0xffff0000, background = 0xffff0000)
-		ev.window.fill_rectangle(gc, 10, 10, 30, 30)
+		ev.window.fill_rectangle(gc, 4, 4, 8, 8)
 
 		pict = ev.window.render_create_picture(118)
-		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 20, 20, 20, 20)
+		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 8, 8, 8, 8)
+
+		cursor = dpy.render_create_cursor(pict, 0, 0)
+		ev.window.change_attributes(cursor = cursor)
 
 		gc.free()
 
