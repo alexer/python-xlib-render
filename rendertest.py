@@ -55,6 +55,7 @@ while 1:
 
 		pict = ev.window.render_create_picture(118)
 		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
+		dpy.render_free_picture(pict)
 
 		pixmap = ev.window.create_pixmap(16, 16, 32)
 		pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, '\x00\xff\x00\xff'*16*16)
@@ -62,6 +63,7 @@ while 1:
 		pixmap.free()
 
 		cursor = dpy.render_create_cursor(pict, 0, 0)
+		dpy.render_free_picture(pict)
 		ev.window.change_attributes(cursor = cursor)
 
 		gc.free()

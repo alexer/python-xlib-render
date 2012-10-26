@@ -201,6 +201,22 @@ def create_picture(self, format, **keys):
     return pid
 
 
+class FreePicture(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(7),
+        rq.RequestLength(),
+        Picture('pid'),
+        )
+
+def free_picture(self, picture):
+    FreePicture(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        pid = picture,
+        )
+
+
 class Composite(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -280,6 +296,10 @@ def init(disp, info):
     disp.extension_add_method('drawable',
                               'render_create_picture',
                               create_picture)
+
+    disp.extension_add_method('display',
+                              'render_free_picture',
+                              free_picture)
 
     disp.extension_add_method('display',
                               'render_composite',
