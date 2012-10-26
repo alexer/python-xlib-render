@@ -58,7 +58,7 @@ while 1:
 		pict.free()
 
 		pixmap = ev.window.create_pixmap(16, 16, 32)
-		pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, '\x00\xff\x00\xff'*16*16)
+		pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, ''.join('\x00\xff\x00\xff' if y <= x else '\x00\x00\x00\x00' for y in range(16) for x in range(16)))
 		pict = pixmap.create_picture(118)
 		pixmap.free()
 
