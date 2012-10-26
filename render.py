@@ -72,6 +72,10 @@ IndexValue = rq.Struct(
     rq.Card16('blue'),
     rq.Card16('alpha'),
     )
+AnimCursorElt = rq.Struct(
+    rq.Cursor('cursor'),
+    rq.Card32('delay'),
+    )
 
 class QueryVersion(rq.ReplyRequest):
     _request = rq.Struct(
@@ -260,6 +264,28 @@ class CreateCursor(rq.Request):
         rq.Card16('y'),
         )
 
+
+class CreateAnimCursor(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(31),
+        rq.RequestLength(),
+        rq.Cursor('cid'),
+        rq.List('cursors', AnimCursorElt),
+        )
+
+def create_anim_cursor(self, cursors):
+    cid = self.display.allocate_resource_id()
+    CreateAnimCursor(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        cid = cid,
+        cursors = cursors,
+        )
+    cls = self.display.get_resource_class('cursor', cursor.Cursor)
+    return cls(self.display, cid, owner = 1)
+
+
 class Picture(resource.Resource):
     __picture__ = resource.Resource.__resource__
 
@@ -304,4 +330,8 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_composite',
                               composite)
+
+    disp.extension_add_method('display',
+                              'create_anim_cursor',
+                              create_anim_cursor)
 

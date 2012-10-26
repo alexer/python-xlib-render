@@ -57,13 +57,17 @@ while 1:
 		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
 		pict.free()
 
-		pixmap = ev.window.create_pixmap(16, 16, 32)
-		pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, ''.join('\x00\xff\x00\xff' if y <= x else '\x00\x00\x00\x00' for y in range(16) for x in range(16)))
-		pict = pixmap.create_picture(118)
-		pixmap.free()
+		cursors = []
+		for i in range(26):
+			pixmap = ev.window.create_pixmap(16, 16, 32)
+			pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, ''.join('\x00' + chr(10*i) + '\x00\xff' if y <= x else '\x00\x00\x00\x00' for y in range(16) for x in range(16)))
+			pict = pixmap.create_picture(118)
+			pixmap.free()
+			cursor = pict.create_cursor(0, 0)
+			pict.free()
+			cursors.append((cursor, 100))
 
-		cursor = pict.create_cursor(0, 0)
-		pict.free()
+		cursor = dpy.create_anim_cursor(cursors)
 		ev.window.change_attributes(cursor = cursor)
 
 		gc.free()
