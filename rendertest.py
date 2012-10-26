@@ -53,17 +53,17 @@ while 1:
 		gc = ev.window.create_gc(foreground = 0xffff0000, background = 0xffff0000)
 		ev.window.fill_rectangle(gc, 20, 20, 60, 60)
 
-		pict = ev.window.render_create_picture(118)
+		pict = ev.window.create_picture(118)
 		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
-		dpy.render_free_picture(pict)
+		pict.free()
 
 		pixmap = ev.window.create_pixmap(16, 16, 32)
 		pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, '\x00\xff\x00\xff'*16*16)
-		pict = pixmap.render_create_picture(118)
+		pict = pixmap.create_picture(118)
 		pixmap.free()
 
-		cursor = dpy.render_create_cursor(pict, 0, 0)
-		dpy.render_free_picture(pict)
+		cursor = pict.create_cursor(0, 0)
+		pict.free()
 		ev.window.change_attributes(cursor = cursor)
 
 		gc.free()

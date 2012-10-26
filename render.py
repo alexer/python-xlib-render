@@ -7,7 +7,7 @@
 
 from Xlib import X
 from Xlib.protocol import rq
-from Xlib.xobject import drawable
+from Xlib.xobject import drawable, resource, cursor
 
 extname = 'RENDER'
 
@@ -16,7 +16,6 @@ Direct = 1
 
 VisualId = rq.Card32
 PictFormat = rq.Card32
-Picture = rq.Card32
 Atom = rq.Card32
 Subpixel = rq.Struct(
     rq.Set('subpixel', 1, (0, 1, 2, 3, 4, 5)),
@@ -168,12 +167,12 @@ class CreatePicture(rq.Request):
         rq.Card8('opcode'),
         rq.Opcode(4),
         rq.RequestLength(),
-        Picture('pid'),
+        rq.Picture('pid'),
         rq.Drawable('drawable'),
         PictFormat('format'),
         rq.ValueList('values', 2, 2,
             rq.Set('repeat', 1, (0, 1, 2, 3)),
-            Picture('alpha_map'),
+            rq.Picture('alpha_map'),
             rq.Int16('alpha_x_origin'),
             rq.Int16('alpha_y_origin'),
             rq.Int16('clip_x_origin'),
@@ -198,7 +197,8 @@ def create_picture(self, format, **keys):
         format = format,
         values = keys,
         )
-    return pid
+    cls = self.display.get_resource_class('picture', Picture)
+    return cls(self.display, pid, owner = 1)
 
 
 class FreePicture(rq.Request):
@@ -206,14 +206,7 @@ class FreePicture(rq.Request):
         rq.Card8('opcode'),
         rq.Opcode(7),
         rq.RequestLength(),
-        Picture('pid'),
-        )
-
-def free_picture(self, picture):
-    FreePicture(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        pid = picture,
+        rq.Picture('pid'),
         )
 
 
@@ -224,9 +217,9 @@ class Composite(rq.Request):
         rq.RequestLength(),
         rq.Card8('op'),
         rq.Pad(3),
-        Picture('src'),
-        Picture('mask'),
-        Picture('dst'),
+        rq.Picture('src'),
+        rq.Picture('mask'),
+        rq.Picture('dst'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.Int16('mask_x'),
@@ -262,22 +255,33 @@ class CreateCursor(rq.Request):
         rq.Opcode(27),
         rq.RequestLength(),
         rq.Cursor('cid'),
-        Picture('source'),
+        rq.Picture('source'),
         rq.Card16('x'),
         rq.Card16('y'),
         )
 
-def create_cursor(self, source, x, y):
-    cid = self.display.allocate_resource_id()
-    CreateCursor(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        cid = cid,
-        source = source,
-        x = x,
-        y = y,
-        )
-    return cid
+class Picture(resource.Resource):
+    __picture__ = resource.Resource.__resource__
+
+    def create_cursor(self, x, y):
+        cid = self.display.allocate_resource_id()
+        CreateCursor(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            cid = cid,
+            source = self,
+            x = x,
+            y = y,
+            )
+        cls = self.display.get_resource_class('cursor', cursor.Cursor)
+        return cls(self.display, cid, owner = 1)
+
+    def free(self):
+        FreePicture(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            pid = self,
+            )
 
 
 def init(disp, info):
@@ -294,18 +298,10 @@ def init(disp, info):
                               query_pict_index_values)
 
     disp.extension_add_method('drawable',
-                              'render_create_picture',
+                              'create_picture',
                               create_picture)
-
-    disp.extension_add_method('display',
-                              'render_free_picture',
-                              free_picture)
 
     disp.extension_add_method('display',
                               'render_composite',
                               composite)
-
-    disp.extension_add_method('display',
-                              'render_create_cursor',
-                              create_cursor)
 
