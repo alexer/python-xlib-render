@@ -40,6 +40,19 @@ print 'Subpixels:'
 for item in res.subpixels:
 	print '-', item
 
+def render_find_format(**kwargs):
+	matches = []
+	for item in res.formats:
+		for key, value in kwargs.iteritems():
+			if item[key] != value:
+				break
+		else:
+			matches.append(item)
+	return matches
+
+format_id = render_find_format(depth=32, alpha_shift=24, red_shift=16, green_shift=8, blue_shift=0, alpha_mask=255, red_mask=255, green_mask=255, blue_mask=255)[0]['id']
+print format_id
+
 #dpy.render_query_pict_index_values(?)
 
 depth = 32
@@ -53,7 +66,7 @@ def create_cursor(win, width, height, xhot, yhot, pixels):
 	pixmap = win.create_pixmap(width, height, 32)
 	pixmap.put_image(gc, 0, 0, width, height, X.ZPixmap, 32, 0, pixels)
 	gc.free()
-	pict = pixmap.create_picture(118)
+	pict = pixmap.create_picture(format_id)
 	pixmap.free()
 	cursor = pict.create_cursor(xhot, yhot)
 	pict.free()
@@ -75,7 +88,7 @@ while 1:
 		gc = ev.window.create_gc(foreground = 0xffff0000, background = 0xffff0000)
 		ev.window.fill_rectangle(gc, 20, 20, 60, 60)
 
-		pict = ev.window.create_picture(118)
+		pict = ev.window.create_picture(format_id)
 		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
 		pict.free()
 
