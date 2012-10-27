@@ -238,6 +238,18 @@ class ChangePicture(rq.Request):
         )
 
 
+class SetPictureClipRectangles(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(6),
+        rq.RequestLength(),
+        rq.Picture('picture'),
+        rq.Int16('clip_x_origin'),
+        rq.Int16('clip_y_origin'),
+        rq.List('rectangles', structs.Rectangle),
+    )
+
+
 class FreePicture(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -328,6 +340,16 @@ class Picture(resource.Resource):
             opcode = self.display.get_extension_major(extname),
             pid = self,
             values = keys,
+            )
+
+    def set_clip_rectangles(self, clip_x_origin, clip_y_origin, *rectangles):
+        SetPictureClipRectangles(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            picture = self,
+            clip_x_origin = clip_x_origin,
+            clip_y_origin = clip_y_origin,
+            rectangles = rectangles,
             )
 
     def create_cursor(self, x, y):
