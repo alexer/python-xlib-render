@@ -1,5 +1,6 @@
 import Xlib.display
 from Xlib import X
+import xcursor
 
 def match_visual_info(screen, depth, visual_class):
 	for depth_info in screen.allowed_depths:
@@ -58,14 +59,15 @@ while 1:
 		pict.free()
 
 		cursors = []
-		for i in range(26):
-			pixmap = ev.window.create_pixmap(16, 16, 32)
-			pixmap.put_image(gc, 0, 0, 16, 16, X.ZPixmap, 32, 0, ''.join('\x00' + chr(10*i) + '\x00\xff' if y <= x else '\x00\x00\x00\x00' for y in range(16) for x in range(16)))
+		data = file('/usr/share/icons/Oxygen_Black/cursors/wait', 'rb').read()
+		for (width, height, xhot, yhot, delay, pixels) in xcursor.parse_cursor(data):
+			pixmap = ev.window.create_pixmap(width, height, 32)
+			pixmap.put_image(gc, 0, 0, width, height, X.ZPixmap, 32, 0, pixels)
 			pict = pixmap.create_picture(118)
 			pixmap.free()
-			cursor = pict.create_cursor(0, 0)
+			cursor = pict.create_cursor(xhot, yhot)
 			pict.free()
-			cursors.append((cursor, 100))
+			cursors.append((cursor, delay))
 
 		cursor = dpy.create_anim_cursor(cursors)
 		ev.window.change_attributes(cursor = cursor)
