@@ -6,7 +6,7 @@
 """Rendering extension"""
 
 from Xlib import X
-from Xlib.protocol import rq
+from Xlib.protocol import rq, structs
 from Xlib.xobject import drawable, resource, cursor
 
 extname = 'RENDER'
@@ -77,21 +77,23 @@ AnimCursorElt = rq.Struct(
     rq.Card32('delay'),
     )
 
-PictureValues = (
-    rq.Set('repeat', 1, (0, 1, 2, 3)),
-    rq.Picture('alpha_map'),
-    rq.Int16('alpha_x_origin'),
-    rq.Int16('alpha_y_origin'),
-    rq.Int16('clip_x_origin'),
-    rq.Int16('clip_y_origin'),
-    rq.Pixmap('clip_mask'),
-    rq.Bool('graphics_exposures'),
-    rq.Set('subwindow_mode', 1, (0, 1)),
-    rq.Set('poly_edge', 1, (0, 1)),
-    rq.Set('poly_mode', 1, (0, 1)),
-    Atom('dither'),
-    rq.Bool('component_alpha'),
-    )
+def PictureValues(arg):
+    return rq.ValueList(arg, 2, 2,
+        rq.Set('repeat', 1, (0, 1, 2, 3)),
+        rq.Picture('alpha_map'),
+        rq.Int16('alpha_x_origin'),
+        rq.Int16('alpha_y_origin'),
+        rq.Int16('clip_x_origin'),
+        rq.Int16('clip_y_origin'),
+        rq.Pixmap('clip_mask'),
+        rq.Bool('graphics_exposures'),
+        rq.Set('subwindow_mode', 1, (0, 1)),
+        rq.Set('poly_edge', 1, (0, 1)),
+        rq.Set('poly_mode', 1, (0, 1)),
+        Atom('dither'),
+        rq.Bool('component_alpha'),
+        )
+
 
 class QueryVersion(rq.ReplyRequest):
     _request = rq.Struct(
@@ -209,7 +211,7 @@ class CreatePicture(rq.Request):
         rq.Picture('pid'),
         rq.Drawable('drawable'),
         PictFormat('format'),
-        rq.ValueList('values', 2, 2, *PictureValues),
+        PictureValues('values'),
         )
 
 def create_picture(self, format, **keys):
@@ -232,7 +234,7 @@ class ChangePicture(rq.Request):
         rq.Opcode(5),
         rq.RequestLength(),
         rq.Picture('pid'),
-        rq.ValueList('values', 2, 2, *PictureValues),
+        PictureValues('values'),
         )
 
 
