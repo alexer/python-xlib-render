@@ -48,6 +48,27 @@ colormap = root.create_colormap(visual, X.AllocNone)
 win = root.create_window(0, 0, 100, 100, 0, depth, X.CopyFromParent, visual, colormap = colormap, background_pixel = 0xffffffff, border_pixel = 0, event_mask = X.ExposureMask)
 win.map()
 
+def create_cursor(win, width, height, xhot, yhot, pixels):
+	gc = win.create_gc()
+	pixmap = win.create_pixmap(width, height, 32)
+	pixmap.put_image(gc, 0, 0, width, height, X.ZPixmap, 32, 0, pixels)
+	gc.free()
+	pict = pixmap.create_picture(118)
+	pixmap.free()
+	cursor = pict.create_cursor(xhot, yhot)
+	pict.free()
+	return cursor
+
+def load_cursor(dpy, win, fname):
+	data = file(fname, 'rb').read()
+	cursors = []
+	for (width, height, xhot, yhot, delay, pixels) in xcursor.parse_cursor(data):
+		cursor = create_cursor(ev.window, width, height, xhot, yhot, pixels)
+		cursors.append((cursor, delay))
+	if len(cursors) <= 1:
+		return cursors[0][0]
+	return dpy.create_anim_cursor(cursors)
+
 while 1:
 	ev = dpy.next_event()
 	if ev.type == X.Expose:
@@ -58,18 +79,7 @@ while 1:
 		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
 		pict.free()
 
-		cursors = []
-		data = file('/usr/share/icons/Oxygen_Black/cursors/wait', 'rb').read()
-		for (width, height, xhot, yhot, delay, pixels) in xcursor.parse_cursor(data):
-			pixmap = ev.window.create_pixmap(width, height, 32)
-			pixmap.put_image(gc, 0, 0, width, height, X.ZPixmap, 32, 0, pixels)
-			pict = pixmap.create_picture(118)
-			pixmap.free()
-			cursor = pict.create_cursor(xhot, yhot)
-			pict.free()
-			cursors.append((cursor, delay))
-
-		cursor = dpy.create_anim_cursor(cursors)
+		cursor = load_cursor(dpy, ev.window, '/usr/share/icons/Oxygen_Black/cursors/half-busy')
 		ev.window.change_attributes(cursor = cursor)
 
 		gc.free()
