@@ -163,7 +163,26 @@ def query_pict_index_values(self, format):
         )
 
 
-# XXX: QueryFilters
+# XXX: Untested, my X server returned BadImplementation
+class QueryFilters(rq.ReplyRequest):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(3),
+        rq.RequestLength(),
+        rq.Drawable('drawable'),
+        )
+
+    _reply = rq.Struct(
+        rq.List('filters', rq.String8),
+        rq.List('aliases', rq.Card16),
+        )
+
+def query_filters(self):
+    return QueryFilters(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        drawable = self,
+        )
 
 
 class CreatePicture(rq.Request):
@@ -322,6 +341,10 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_query_pict_index_values',
                               query_pict_index_values)
+
+    disp.extension_add_method('drawable',
+                              'render_query_filters',
+                              query_filters)
 
     disp.extension_add_method('drawable',
                               'create_picture',
