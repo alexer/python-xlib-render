@@ -76,7 +76,7 @@ def load_cursor(dpy, win, fname):
 	data = file(fname, 'rb').read()
 	cursors = []
 	for (width, height, xhot, yhot, delay, pixels) in xcursor.parse_cursor(data):
-		cursor = create_cursor(ev.window, width, height, xhot, yhot, pixels)
+		cursor = create_cursor(win, width, height, xhot, yhot, pixels)
 		cursors.append((cursor, delay))
 	if len(cursors) <= 1:
 		return cursors[0][0]
