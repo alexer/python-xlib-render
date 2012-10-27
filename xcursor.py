@@ -1,4 +1,5 @@
 import struct
+from Xlib import X
 
 def chunk(data, size):
 	assert size <= len(data)
@@ -63,6 +64,27 @@ def parse_cursor(data):
 	assert len(data) == 0
 
 	return imgs
+
+def create_cursor(win, format_id, width, height, xhot, yhot, pixels):
+	gc = win.create_gc()
+	pixmap = win.create_pixmap(width, height, 32)
+	pixmap.put_image(gc, 0, 0, width, height, X.ZPixmap, 32, 0, pixels)
+	gc.free()
+	pict = pixmap.create_picture(format_id)
+	pixmap.free()
+	cursor = pict.create_cursor(xhot, yhot)
+	pict.free()
+	return cursor
+
+def load_cursor(dpy, win, format_id, fname):
+	data = file(fname, 'rb').read()
+	cursors = []
+	for (width, height, xhot, yhot, delay, pixels) in parse_cursor(data):
+		cursor = create_cursor(win, format_id, width, height, xhot, yhot, pixels)
+		cursors.append((cursor, delay))
+	if len(cursors) <= 1:
+		return cursors[0][0]
+	return dpy.create_anim_cursor(cursors)
 
 if __name__ == '__main__':
 	data = file('/usr/share/icons/Oxygen_Black/cursors/wait', 'rb').read()
