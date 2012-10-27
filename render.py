@@ -153,7 +153,7 @@ class QueryPictIndexValues(rq.ReplyRequest):
         rq.LengthOf('indexvalues', 4),
         rq.Pad(20),
         rq.List('indexvalues', IndexValue),
-    )
+        )
 
 def query_pict_index_values(self, format):
     return QueryPictIndexValues(
