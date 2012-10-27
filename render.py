@@ -77,6 +77,22 @@ AnimCursorElt = rq.Struct(
     rq.Card32('delay'),
     )
 
+PictureValues = (
+    rq.Set('repeat', 1, (0, 1, 2, 3)),
+    rq.Picture('alpha_map'),
+    rq.Int16('alpha_x_origin'),
+    rq.Int16('alpha_y_origin'),
+    rq.Int16('clip_x_origin'),
+    rq.Int16('clip_y_origin'),
+    rq.Pixmap('clip_mask'),
+    rq.Bool('graphics_exposures'),
+    rq.Set('subwindow_mode', 1, (0, 1)),
+    rq.Set('poly_edge', 1, (0, 1)),
+    rq.Set('poly_mode', 1, (0, 1)),
+    Atom('dither'),
+    rq.Bool('component_alpha'),
+    )
+
 class QueryVersion(rq.ReplyRequest):
     _request = rq.Struct(
             rq.Card8('opcode'),
@@ -193,21 +209,7 @@ class CreatePicture(rq.Request):
         rq.Picture('pid'),
         rq.Drawable('drawable'),
         PictFormat('format'),
-        rq.ValueList('values', 2, 2,
-            rq.Set('repeat', 1, (0, 1, 2, 3)),
-            rq.Picture('alpha_map'),
-            rq.Int16('alpha_x_origin'),
-            rq.Int16('alpha_y_origin'),
-            rq.Int16('clip_x_origin'),
-            rq.Int16('clip_y_origin'),
-            rq.Pixmap('clip_mask'),
-            rq.Bool('graphics_exposures'),
-            rq.Set('subwindow_mode', 1, (0, 1)),
-            rq.Set('poly_edge', 1, (0, 1)),
-            rq.Set('poly_mode', 1, (0, 1)),
-            Atom('dither'),
-            rq.Bool('component_alpha'),
-            ),
+        rq.ValueList('values', 2, 2, *PictureValues),
         )
 
 def create_picture(self, format, **keys):
@@ -222,6 +224,16 @@ def create_picture(self, format, **keys):
         )
     cls = self.display.get_resource_class('picture', Picture)
     return cls(self.display, pid, owner = 1)
+
+
+class ChangePicture(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(5),
+        rq.RequestLength(),
+        rq.Picture('pid'),
+        rq.ValueList('values', 2, 2, *PictureValues),
+        )
 
 
 class FreePicture(rq.Request):
@@ -307,6 +319,14 @@ def create_anim_cursor(self, cursors):
 
 class Picture(resource.Resource):
     __picture__ = resource.Resource.__resource__
+
+    def change(self, **keys):
+        ChangePicture(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            pid = self,
+            values = keys,
+            )
 
     def create_cursor(self, x, y):
         cid = self.display.allocate_resource_id()
