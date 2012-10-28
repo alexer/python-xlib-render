@@ -479,6 +479,46 @@ def tri_fan(self, op, src, dst, mask_format, src_x, src_y, *points):
         )
 
 
+class CreateGlyphSet(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(17),
+        rq.RequestLength(),
+        rq.GlyphSet('gsid'),
+        PictFormat('format'),
+        )
+
+def create_glyph_set(self, format):
+    gsid = self.display.allocate_resource_id()
+    CreateGlyphSet(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        gsid = gsid,
+        format = format,
+        )
+    cls = self.display.get_resource_class('glyphset', GlyphSet)
+    return cls(self.display, gsid, owner = 1)
+
+
+class ReferenceGlyphSet(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(18),
+        rq.RequestLength(),
+        rq.GlyphSet('gsid'),
+        rq.GlyphSet('existing'),
+        )
+
+
+class FreeGlyphSet(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(19),
+        rq.RequestLength(),
+        rq.GlyphSet('glyphset'),
+        )
+
+
 class FillRectangles(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -644,6 +684,28 @@ class Picture(resource.Resource):
             )
 
 
+class GlyphSet(resource.Resource):
+    __glyphset__ = resource.Resource.__resource__
+
+    def reference(self):
+        gsid = self.display.allocate_resource_id()
+        ReferenceGlyphSet(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            gsid = gsid,
+            existing = self,
+            )
+        cls = self.display.get_resource_class('glyphset', GlyphSet)
+        return cls(self.display, gsid, owner = 1)
+
+    def free(self):
+        FreeGlyphSet(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            glyphset = self,
+            )
+
+
 def init(disp, info):
     disp.extension_add_method('display',
                               'render_query_version',
@@ -688,6 +750,10 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_tri_fan',
                               tri_fan)
+
+    disp.extension_add_method('display',
+                              'create_glyph_set',
+                              create_glyph_set)
 
     disp.extension_add_method('display',
                               'create_anim_cursor',
