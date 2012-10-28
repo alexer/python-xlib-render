@@ -259,7 +259,7 @@ class SetPictureClipRectangles(rq.Request):
         rq.Int16('clip_x_origin'),
         rq.Int16('clip_y_origin'),
         rq.List('rectangles', structs.Rectangle),
-    )
+        )
 
 
 class FreePicture(rq.Request):
@@ -329,7 +329,7 @@ class SetPictureTransform(rq.Request):
         rq.RequestLength(),
         rq.Picture('picture'),
         rq.Object('transform', Transform),
-    )
+        )
 
 
 class CreateAnimCursor(rq.Request):
