@@ -167,6 +167,7 @@ def query_pict_formats(self):
         )
 
 
+# XXX: Untested, my X sever returned BadMatch on every format I tried; no indexed PictFormats?
 class QueryPictIndexValues(rq.ReplyRequest):
     _request = rq.Struct(
         rq.Card8('opcode'),
