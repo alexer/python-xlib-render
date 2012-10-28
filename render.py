@@ -88,6 +88,15 @@ Transform = rq.Struct(
     Fixed('p32'),
     Fixed('p33'),
     )
+Color = rq.Struct(
+    rq.Card16('red'),
+    rq.Card16('green'),
+    rq.Card16('blue'),
+    rq.Card16('alpha'),
+    )
+
+def PictOp(arg):
+    return rq.Set(arg, 1, tuple(range(0x00, 0x0d+1) + range(0x10, 0x1b+1) + range(0x20, 0x2b+1) + range(0x30, 0x3e+1)))
 
 def PictureValues(arg):
     return rq.ValueList(arg, 2, 2,
@@ -293,6 +302,20 @@ def composite(self, op, src, mask, dst, src_x, src_y, mask_x, mask_y, dst_x, dst
         height = height,
         )
 
+
+class FillRectangles(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(26),
+        rq.RequestLength(),
+        PictOp('op'),
+        rq.Pad(3),
+        rq.Picture('dst'),
+        rq.Object('color', Color),
+        rq.List('rects', structs.Rectangle),
+        )
+
+
 class CreateCursor(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -412,6 +435,16 @@ class Picture(resource.Resource):
             picture = self,
             filter = filter,
             values = values,
+            )
+
+    def fill_rectangles(self, op, color, *rects):
+        FillRectangles(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            dst = self,
+            color = color,
+            rects = rects,
             )
 
     def create_cursor(self, x, y):
