@@ -303,6 +303,42 @@ def composite(self, op, src, mask, dst, src_x, src_y, mask_x, mask_y, dst_x, dst
         )
 
 
+# XXX: Untested, my X server returned BadImplementation (removed in renderproto 0.6)
+class Scale(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(9),
+        rq.RequestLength(),
+        rq.Picture('src'),
+        rq.Picture('dst'),
+        rq.Card32('color_scale'),
+        rq.Card32('alpha_scale'),
+        rq.Int16('src_x'),
+        rq.Int16('src_y'),
+        rq.Int16('dst_x'),
+        rq.Int16('dst_y'),
+        rq.Card16('width'),
+        rq.Card16('height'),
+        )
+
+# XXX: method of picture
+def scale(self, src, dst, color_scale, alpha_scale, src_x, src_y, dst_x, dst_y, width, height):
+    return Scale(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        src = src,
+        dst = dst,
+        color_scale = color_scale,
+        alpha_scale = alpha_scale,
+        src_x = src_x,
+        src_y = src_y,
+        dst_x = dst_x,
+        dst_y = dst_y,
+        width = width,
+        height = height
+        )
+
+
 class FillRectangles(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -492,6 +528,10 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_composite',
                               composite)
+
+    disp.extension_add_method('display',
+                              'render_scale',
+                              scale)
 
     disp.extension_add_method('display',
                               'create_anim_cursor',
