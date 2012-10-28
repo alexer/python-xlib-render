@@ -113,6 +113,14 @@ Triangle = rq.Struct(
     rq.Object('p2', PointFix),
     rq.Object('p3', PointFix),
     )
+GlyphInfo = rq.Struct(
+    rq.Card16('width'),
+    rq.Card16('height'),
+    rq.Int16('x'),
+    rq.Int16('y'),
+    rq.Int16('off_x'),
+    rq.Int16('off_y'),
+    )
 
 def PictOp(arg):
     return rq.Set(arg, 1, tuple(range(0x00, 0x0d+1) + range(0x10, 0x1b+1) + range(0x20, 0x2b+1) + range(0x30, 0x3e+1)))
@@ -519,6 +527,29 @@ class FreeGlyphSet(rq.Request):
         )
 
 
+class AddGlyphs(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(20),
+        rq.RequestLength(),
+        rq.GlyphSet('glyphset'),
+        rq.LengthOf(('glyphids', 'glyphs'), 4),
+        rq.List('glyphids', rq.Card32),
+        rq.List('glyphs', GlyphInfo),
+        rq.String8('images'),
+        )
+
+
+class FreeGlyphs(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(22),
+        rq.RequestLength(),
+        rq.GlyphSet('glyphset'),
+        rq.List('glyphs', rq.Card32),
+        )
+
+
 class FillRectangles(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -703,6 +734,24 @@ class GlyphSet(resource.Resource):
             display = self.display,
             opcode = self.display.get_extension_major(extname),
             glyphset = self,
+            )
+
+    def add_glyphs(self, *glyphs):
+        AddGlyphs(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            glyphset = self,
+            glyphids = [glyph[0] for glyph in glyphs],
+            glyphs = [glyph[1] for glyph in glyphs],
+            images = ''.join(glyph[2] for glyph in glyphs),
+            )
+
+    def free_glyphs(self, *glyphs):
+        FreeGlyphs(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            glyphset = self,
+            glyphs = glyphs,
             )
 
 
