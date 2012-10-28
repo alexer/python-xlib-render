@@ -108,6 +108,11 @@ Trapezoid = rq.Struct(
     rq.Object('left', LineFix),
     rq.Object('right', LineFix),
     )
+Triangle = rq.Struct(
+    rq.Object('p1', PointFix),
+    rq.Object('p2', PointFix),
+    rq.Object('p3', PointFix),
+    )
 
 def PictOp(arg):
     return rq.Set(arg, 1, tuple(range(0x00, 0x0d+1) + range(0x10, 0x1b+1) + range(0x20, 0x2b+1) + range(0x30, 0x3e+1)))
@@ -383,6 +388,36 @@ def trapezoids(self, op, src, dst, mask_format, src_x, src_y, *traps):
         )
 
 
+class Triangles(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(11),
+        rq.RequestLength(),
+        PictOp('op'),
+        rq.Pad(3),
+        rq.Picture('src'),
+        rq.Picture('dst'),
+        PictFormat('mask_format', (X.NONE, )),
+        rq.Int16('src_x'),
+        rq.Int16('src_y'),
+        rq.List('triangles', Triangle),
+        )
+
+# XXX: method of picture
+def triangles(self, op, src, dst, mask_format, src_x, src_y, *triangles):
+    Triangles(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        op = op,
+        src = src,
+        dst = dst,
+        mask_format = mask_format,
+        src_x = src_x,
+        src_y = src_y,
+        triangles = triangles,
+        )
+
+
 class FillRectangles(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -580,6 +615,10 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_trapezoids',
                               trapezoids)
+
+    disp.extension_add_method('display',
+                              'render_triangles',
+                              triangles)
 
     disp.extension_add_method('display',
                               'create_anim_cursor',
