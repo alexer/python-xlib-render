@@ -783,6 +783,115 @@ class AddTraps(rq.Request):
         )
 
 
+class CreateSolidFill(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(33),
+        rq.RequestLength(),
+        rq.Picture('pid'),
+        rq.Object('color', Color),
+        )
+
+def create_solid_fill(self, color):
+    pid = self.display.allocate_resource_id()
+    CreateSolidFill(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        pid = pid,
+        color = color,
+        )
+    cls = self.display.get_resource_class('picture', Picture)
+    return cls(self.display, pid, owner = 1)
+
+
+class CreateLinearGradient(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(34),
+        rq.RequestLength(),
+        rq.Picture('pid'),
+        rq.Object('p1', PointFix),
+        rq.Object('p2', PointFix),
+        rq.LengthOf(('stops', 'stop_colors'), 4),
+        rq.List('stops', Fixed),
+        rq.List('stop_colors', Color),
+        )
+
+def create_linear_gradient(self, p1, p2, *stops):
+    pid = self.display.allocate_resource_id()
+    CreateLinearGradient(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        pid = pid,
+        p1 = p1,
+        p2 = p2,
+        stops = [stop[0] for stop in stops],
+        stop_colors = [stop[1] for stop in stops],
+        )
+    cls = self.display.get_resource_class('picture', Picture)
+    return cls(self.display, pid, owner = 1)
+
+
+class CreateRadialGradient(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(35),
+        rq.RequestLength(),
+        rq.Picture('pid'),
+        rq.Object('inner_center', PointFix),
+        rq.Object('outer_center', PointFix),
+        Fixed('inner_radius'),
+        Fixed('outer_radius'),
+        rq.LengthOf(('stops', 'stop_colors'), 4),
+        rq.List('stops', Fixed),
+        rq.List('stop_colors', Color),
+        )
+
+def create_radial_gradient(self, inner_center, outer_center, inner_radius, outer_radius, *stops):
+    pid = self.display.allocate_resource_id()
+    CreateRadialGradient(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        pid = pid,
+        inner_center = inner_center,
+        outer_center = outer_center,
+        inner_radius = inner_radius,
+        outer_radius = outer_radius,
+        stops = [stop[0] for stop in stops],
+        stop_colors = [stop[1] for stop in stops],
+        )
+    cls = self.display.get_resource_class('picture', Picture)
+    return cls(self.display, pid, owner = 1)
+
+
+class CreateConicalGradient(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(36),
+        rq.RequestLength(),
+        rq.Picture('pid'),
+        rq.Object('center', PointFix),
+        Fixed('angle'),
+        rq.LengthOf(('stops', 'stop_colors'), 4),
+        rq.List('stops', Fixed),
+        rq.List('stop_colors', Color),
+        )
+
+def create_conical_gradient(self, center, angle, *stops):
+    pid = self.display.allocate_resource_id()
+    CreateConicalGradient(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        pid = pid,
+        center = center,
+        angle = angle,
+        stops = [stop[0] for stop in stops],
+        stop_colors = [stop[1] for stop in stops],
+        )
+    cls = self.display.get_resource_class('picture', Picture)
+    return cls(self.display, pid, owner = 1)
+
+
 class Picture(resource.Resource):
     __picture__ = resource.Resource.__resource__
 
@@ -966,4 +1075,20 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'create_anim_cursor',
                               create_anim_cursor)
+
+    disp.extension_add_method('display',
+                              'create_solid_fill',
+                              create_solid_fill)
+
+    disp.extension_add_method('display',
+                              'create_linear_gradient',
+                              create_linear_gradient)
+
+    disp.extension_add_method('display',
+                              'create_radial_gradient',
+                              create_radial_gradient)
+
+    disp.extension_add_method('display',
+                              'create_conical_gradient',
+                              create_conical_gradient)
 
