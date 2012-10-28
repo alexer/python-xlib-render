@@ -261,8 +261,8 @@ def query_pict_index_values(self, format):
         )
 
 
-# XXX: Untested, my X server returned BadImplementation and I can't find the format anywhere
-#QueryDithers, opcode=3
+# XXX: Not implemented (not in spec)
+# QueryDithers, opcode=3
 
 
 class CreatePicture(rq.Request):
@@ -361,7 +361,7 @@ def composite(self, op, src, mask, dst, src_x, src_y, mask_x, mask_y, dst_x, dst
         )
 
 
-# XXX: Untested, my X server returned BadImplementation (removed in renderproto 0.6)
+# XXX: Untested (not in spec)
 class Scale(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -518,6 +518,12 @@ def tri_fan(self, op, src, dst, mask_format, src_x, src_y, *points):
         )
 
 
+# XXX: Not implemented (not in spec)
+# ColorTrapezoids, opcode=14
+# ColorTriangles, opcode=15
+## Transform, opcode=16
+
+
 class CreateGlyphSet(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -579,6 +585,10 @@ class FreeGlyphs(rq.Request):
         rq.GlyphSet('glyphset'),
         rq.List('glyphs', rq.Card32),
         )
+
+
+# XXX: Not implemented (not in spec)
+# AddGlyphsFromPicture, opcode=21
 
 
 class CompositeGlyphs8(rq.Request):
