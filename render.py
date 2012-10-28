@@ -419,6 +419,66 @@ def triangles(self, op, src, dst, mask_format, src_x, src_y, *triangles):
         )
 
 
+class TriStrip(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(12),
+        rq.RequestLength(),
+        PictOp('op'),
+        rq.Pad(3),
+        rq.Picture('src'),
+        rq.Picture('dst'),
+        PictFormat('mask_format', (X.NONE, )),
+        rq.Int16('src_x'),
+        rq.Int16('src_y'),
+        rq.List('points', PointFix),
+        )
+
+# XXX: method of picture
+def tri_strip(self, op, src, dst, mask_format, src_x, src_y, *points):
+    TriStrip(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        op = op,
+        src = src,
+        dst = dst,
+        mask_format = mask_format,
+        src_x = src_x,
+        src_y = src_y,
+        points = points,
+        )
+
+
+class TriFan(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(13),
+        rq.RequestLength(),
+        PictOp('op'),
+        rq.Pad(3),
+        rq.Picture('src'),
+        rq.Picture('dst'),
+        PictFormat('mask_format', (X.NONE, )),
+        rq.Int16('src_x'),
+        rq.Int16('src_y'),
+        rq.List('points', PointFix),
+        )
+
+# XXX: method of picture
+def tri_fan(self, op, src, dst, mask_format, src_x, src_y, *points):
+    TriFan(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        op = op,
+        src = src,
+        dst = dst,
+        mask_format = mask_format,
+        src_x = src_x,
+        src_y = src_y,
+        points = points,
+        )
+
+
 class FillRectangles(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -620,6 +680,14 @@ def init(disp, info):
     disp.extension_add_method('display',
                               'render_triangles',
                               triangles)
+
+    disp.extension_add_method('display',
+                              'render_tri_strip',
+                              tri_strip)
+
+    disp.extension_add_method('display',
+                              'render_tri_fan',
+                              tri_fan)
 
     disp.extension_add_method('display',
                               'create_anim_cursor',
