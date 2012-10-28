@@ -14,7 +14,7 @@ def parse_cursor(data):
 	assert magic == 'Xcur'
 
 	(header_size, version, toc_count), data = unpack(data, 12, '<III')
-	print 'HDR: size, version, count =', (header_size, version, toc_count)
+	#print 'HDR: size, version, count =', (header_size, version, toc_count)
 	assert header_size == 16
 
 	tocs = []
@@ -22,7 +22,7 @@ def parse_cursor(data):
 		item, data = unpack(data, 12, '<III')
 		type, subtype, position = item
 		tocs.append(item)
-		print 'TOC: type, subtype, position =', item
+		#print 'TOC: type, subtype, position =', item
 
 	assert tocs[0][2] == header_size + toc_count * 12
 
@@ -33,7 +33,7 @@ def parse_cursor(data):
 
 		item, data = unpack(data, 16, '<IIII')
 		header_size, type, subtype, version = item
-		print 'CHUNK: size, type, subtype, version =', item
+		#print 'CHUNK: size, type, subtype, version =', item
 
 		assert header_size == {0xfffe0001: 20, 0xfffd0002: 36}[type]
 		assert toc_type == type
@@ -45,12 +45,12 @@ def parse_cursor(data):
 			item, data = unpack(data, 4, '<I')
 			length, = item
 			string, data = chunk(data, length)
-			print 'STR:', repr(string)
+			#print 'STR:', repr(string)
 		if type == 0xfffd0002:
 			assert version == 1
 			item, data = unpack(data, 20, '<IIIII')
 			width, height, xhot, yhot, delay = item
-			print 'IMG: width, height, xhot, yhot, delay =', item
+			#print 'IMG: width, height, xhot, yhot, delay =', item
 			assert width <= 0x7fff
 			assert height <= 0x7fff
 			assert xhot <= width
