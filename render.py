@@ -76,6 +76,18 @@ AnimCursorElt = rq.Struct(
     rq.Cursor('cursor'),
     rq.Card32('delay'),
     )
+Fixed = rq.Card32 # XXX: 16bit + 16bit, fixed-point
+Transform = rq.Struct(
+    Fixed('p11'),
+    Fixed('p12'),
+    Fixed('p13'),
+    Fixed('p21'),
+    Fixed('p22'),
+    Fixed('p23'),
+    Fixed('p31'),
+    Fixed('p32'),
+    Fixed('p33'),
+    )
 
 def PictureValues(arg):
     return rq.ValueList(arg, 2, 2,
@@ -310,6 +322,16 @@ class CreateCursor(rq.Request):
         )
 
 
+class SetPictureTransform(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(28),
+        rq.RequestLength(),
+        rq.Picture('picture'),
+        rq.Object('transform', Transform),
+    )
+
+
 class CreateAnimCursor(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -350,6 +372,14 @@ class Picture(resource.Resource):
             clip_x_origin = clip_x_origin,
             clip_y_origin = clip_y_origin,
             rectangles = rectangles,
+            )
+
+    def set_transform(self, transform):
+        SetPictureTransform(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            picture = self,
+            transform = transform,
             )
 
     def create_cursor(self, x, y):
