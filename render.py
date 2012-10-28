@@ -194,26 +194,8 @@ def query_pict_index_values(self, format):
         )
 
 
-# XXX: Untested, my X server returned BadImplementation
-class QueryFilters(rq.ReplyRequest):
-    _request = rq.Struct(
-        rq.Card8('opcode'),
-        rq.Opcode(3),
-        rq.RequestLength(),
-        rq.Drawable('drawable'),
-        )
-
-    _reply = rq.Struct(
-        rq.List('filters', rq.String8),
-        rq.List('aliases', rq.Card16),
-        )
-
-def query_filters(self):
-    return QueryFilters(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        drawable = self,
-        )
+# XXX: Untested, my X server returned BadImplementation and I can't find the format anywhere
+#QueryDithers, opcode=3
 
 
 class CreatePicture(rq.Request):
@@ -333,13 +315,41 @@ class SetPictureTransform(rq.Request):
         )
 
 
-# XXX: Untested, my X server returned BadName, possibly related to the BadImplementation from QueryFilters
+class QueryFilters(rq.ReplyRequest):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(29),
+        rq.RequestLength(),
+        rq.Drawable('drawable'),
+        )
+
+    _reply = rq.Struct(
+        rq.ReplyCode(),
+        rq.Pad(1),
+        rq.Card16('sequence_number'),
+        rq.LengthOf('aliases', 4),
+        rq.LengthOf('filters', 4),
+        rq.Pad(4),
+        rq.List('aliases', rq.Card16),
+        rq.List('filters', rq.Struct(rq.LengthOf('string', 1), rq.String8('string', pad=0))), # XXX: This yields dictionaries, we want strings
+        )
+
+def query_filters(self):
+    return QueryFilters(
+        display = self.display,
+        opcode = self.display.get_extension_major(extname),
+        drawable = self,
+        )
+
+
 class SetPictureFilter(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
         rq.Opcode(30),
         rq.RequestLength(),
         rq.Picture('picture'),
+        rq.LengthOf('filter', 2),
+        rq.Pad(2),
         rq.String8('filter'),
         rq.List('values', Fixed),
         )
