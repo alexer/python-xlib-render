@@ -51,7 +51,6 @@ def render_find_format(**kwargs):
 	return matches
 
 format_id = render_find_format(depth=32, alpha_shift=24, red_shift=16, green_shift=8, blue_shift=0, alpha_mask=255, red_mask=255, green_mask=255, blue_mask=255)[0]['id']
-print format_id
 
 #dpy.render_query_pict_index_values(?)
 
@@ -64,15 +63,16 @@ win.map()
 while 1:
 	ev = dpy.next_event()
 	if ev.type == X.Expose:
-		gc = ev.window.create_gc(foreground = 0xffff0000, background = 0xffff0000)
+		gc = ev.window.create_gc(foreground = 0xffffffff, background = 0xffffffff)
+		ev.window.fill_rectangle(gc, 0, 0, 100, 100)
+		gc.change(foreground = 0xffff0000, background = 0xffff0000)
 		ev.window.fill_rectangle(gc, 20, 20, 60, 60)
+		gc.free()
 
 		pict = ev.window.create_picture(format_id)
-		dpy.render_composite(1, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
+		dpy.render_composite(3, pict, X.NONE, pict, 0, 0, 0, 0, 40, 40, 40, 40)
 		pict.free()
 
 		cursor = xcursor.load_cursor(dpy, ev.window, format_id, '/usr/share/icons/Oxygen_Black/cursors/half-busy')
 		ev.window.change_attributes(cursor = cursor)
-
-		gc.free()
 
