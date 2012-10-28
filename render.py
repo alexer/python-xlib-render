@@ -143,6 +143,15 @@ GlyphElt32 = rq.Struct(
     rq.List('glyphs', rq.Card32),
     )
 # XXX: GlyphItemN = GlyphEltN(...) OR GlyphEltN(size=0xff)+GlyphSet
+SpanFix = rq.Struct(
+    Fixed('left'),
+    Fixed('right'),
+    Fixed('y'),
+    )
+Trap = rq.Struct(
+    rq.Object('top', SpanFix),
+    rq.Object('bottom', SpanFix),
+    )
 
 def PictOp(arg):
     return rq.Set(arg, 1, tuple(range(0x00, 0x0d+1) + range(0x10, 0x1b+1) + range(0x20, 0x2b+1) + range(0x30, 0x3e+1)))
@@ -761,6 +770,19 @@ def create_anim_cursor(self, cursors):
     return cls(self.display, cid, owner = 1)
 
 
+# XXX: Untested
+class AddTraps(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(32),
+        rq.RequestLength(),
+        rq.Picture('picture'),
+        rq.Int16('off_x'),
+        rq.Int16('off_y'),
+        rq.List('trapezoids', Trap),
+        )
+
+
 class Picture(resource.Resource):
     __picture__ = resource.Resource.__resource__
 
@@ -821,6 +843,16 @@ class Picture(resource.Resource):
             )
         cls = self.display.get_resource_class('cursor', cursor.Cursor)
         return cls(self.display, cid, owner = 1)
+
+    def add_traps(self, off_x, off_y, *trapezoids):
+        AddTraps(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            picture = self,
+            off_x = off_x,
+            off_y = off_y,
+            trapezoids = trapezoids,
+            )
 
     def free(self):
         FreePicture(
