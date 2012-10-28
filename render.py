@@ -374,6 +374,7 @@ class Trapezoids(rq.Request):
         rq.List('traps', Trapezoid), # XXX: The point structures are inlined into lines
         )
 
+# XXX: method of picture
 def trapezoids(self, op, src, dst, mask_format, src_x, src_y, *traps):
     Trapezoids(
         display = self.display,
