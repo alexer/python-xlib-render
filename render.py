@@ -332,6 +332,18 @@ class SetPictureTransform(rq.Request):
         )
 
 
+# XXX: Untested, my X server returned BadName, possibly related to the BadImplementation from QueryFilters
+class SetPictureFilter(rq.Request):
+    _request = rq.Struct(
+        rq.Card8('opcode'),
+        rq.Opcode(30),
+        rq.RequestLength(),
+        rq.Picture('picture'),
+        rq.String8('filter'),
+        rq.List('values', Fixed),
+        )
+
+
 class CreateAnimCursor(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -380,6 +392,15 @@ class Picture(resource.Resource):
             opcode = self.display.get_extension_major(extname),
             picture = self,
             transform = transform,
+            )
+
+    def set_filter(self, filter, *values):
+        SetPictureFilter(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            picture = self,
+            filter = filter,
+            values = values,
             )
 
     def create_cursor(self, x, y):
