@@ -11,6 +11,13 @@ from Xlib.xobject import drawable, resource, cursor
 
 extname = 'RENDER'
 
+class Fixed(rq.Card32):
+    def check_value(self, value):
+        return int(value*2**16)
+
+    def parse_value(self, value, display):
+        return value/float(2**16)
+
 Indexed = 0
 Direct = 1
 
@@ -76,7 +83,6 @@ AnimCursorElt = rq.Struct(
     rq.Cursor('cursor'),
     rq.Card32('delay'),
     )
-Fixed = rq.Card32 # XXX: 16bit + 16bit, fixed-point
 Transform = rq.Struct(
     Fixed('p11'),
     Fixed('p12'),
