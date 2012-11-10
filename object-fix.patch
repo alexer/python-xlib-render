@@ -1,0 +1,84 @@
+diff --git a/Xlib/protocol/rq.py b/Xlib/protocol/rq.py
+index 3ad31a1..cad8baf 100644
+--- a/Xlib/protocol/rq.py
++++ b/Xlib/protocol/rq.py
+@@ -554,8 +554,6 @@ class FixedList(List):
+ 
+ 
+ class Object(ValueField):
+-    structcode = None
+-
+     def __init__(self, name, type, default = None):
+         ValueField.__init__(self, name, default)
+         self.type = type
+@@ -563,55 +561,29 @@ class Object(ValueField):
+         self.structvalues = self.type.structvalues
+ 
+     def parse_binary_value(self, data, display, length, format):
+-        if self.type.structcode is None:
+-            return self.type.parse_binary(data, display)
+-
+-        else:
+-            scode = '=' + self.type.structcode
+-            slen = struct.calcsize(scode)
+-
+-            v = struct.unpack(scode, data[:slen])
+-            if self.type.structvalues == 1:
+-                v = v[0]
+-
+-            if self.type.parse_value is not None:
+-                v = self.type.parse_value(v, display)
+-
+-            return v, buffer(data, slen)
++        return self.type.parse_binary(data, display)
+ 
+     def parse_value(self, val, display):
+-        if self.type.parse_value is None:
+-            return val
+-        else:
+-            return self.type.parse_value(val, display)
++        return self.type.parse_value(val, display)
+ 
+     def pack_value(self, val):
+-        # Single-char values, we'll assume that mean an integer
+-        if self.type.structcode and len(self.type.structcode) == 1:
+-            return struct.pack('=' + self.type.structcode, val), None, None
+-        else:
+-            return self.type.pack_value(val)
++        return self.type.pack_value(val)
+ 
+     def check_value(self, val):
+-        if self.type.structcode is None:
+-            return val
+-
+-        if type(val) is types.TupleType:
+-            return val
+-
+-        if type(val) is types.DictType:
+-            data = val
+-        elif isinstance(val, DictWrapper):
+-            data = val._data
+-        else:
+-            raise TypeError('Object value must be tuple, dictionary or DictWrapper: %s' % val)
++        if type(val) is not types.TupleType:
++            if type(val) is types.DictType:
++                data = val
++            elif isinstance(val, DictWrapper):
++                data = val._data
++            else:
++                raise TypeError('Object value must be tuple, dictionary or DictWrapper: %s' % val)
+ 
+-        vals = []
+-        for f in self.type.fields:
+-            if f.name:
+-                vals.append(data[f.name])
++            val = []
++            for f in self.type.fields:
++                if f.name:
++                    val.append(data[f.name])
+ 
+-        return vals
++        return [field.check_value(value) if field.check_value else value for field, value in zip(self.type.fields, val)]
+ 
+ 
+ class PropertyData(ValueField):

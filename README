@@ -5,6 +5,9 @@ This is a work-in-progress; the interface can and will change.
 
 To test this, apply integrate-render.patch against r157 of the
 python-xlib trunk and copy render.py to the ext/ directory under Xlib.
+There's also object-fix.patch which fixes Object.check_value() and
+simplifies the other methods a bit, which makes the Fixed type in the
+render extension serialize correctly when used with Object.
 
 The support for multiple fields in LengthOf that was added in r157 is
 needed for render.py to work, although it is not strictly necessary,
