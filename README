@@ -3,29 +3,12 @@ RENDER extension implementation for python-xlib
 
 This is a work-in-progress; the interface can and will change.
 
-To test this, copy render.py to the ext/ directory under Xlib.
-You also need to make some changes to other files:
-- Add to __extensions__ in Xlib.ext.__init__:
-    ('RENDER', 'render'),
-- Add to Xlib.display, at the top:
-    import ext.render
-- Add to _resource_baseclasses in Xlib.display:
-    'picture': ext.render.Picture,
-    'glyphset': ext.render.GlyphSet,
-- Add to 'resource' entry of _resource_hierarchy in Xlib.display:
-    'picture',
-    'glyphset',
-- Add to Xlib.protocol.rq, after the other resources:
-    class Picture(Resource):
-        cast_function = '__picture__'
-        class_name = 'picture'
+To test this, apply integrate-render.patch against r157 of the
+python-xlib trunk and copy render.py to the ext/ directory under Xlib.
 
-    class GlyphSet(Resource):
-        cast_function = '__glyphset__'
-        class_name = 'glyphset'
-- Add support for multiple fields to LengthOf in Xlib.protocol.rq:
-  - Not strictly necessary, since it is only used in requests
-  - Implementation can be found at: http://sourceforge.net/mailarchive/forum.php?thread_name=20120703192708.1e620fe7%40bhuda.mired.org&forum_name=python-xlib-users
-
-I bet you'd have wanted a diff instead! (Maybe later)
+The support for multiple fields in LengthOf that was added in r157 is
+needed for render.py to work, although it is not strictly necessary,
+since the feature is only used in requests. Maybe the feature could
+add a check that all the referenced fields are the same size?
+(Kind of like FixedList checks that the value is the right size)
 

@@ -1,0 +1,62 @@
+diff --git a/Xlib/display.py b/Xlib/display.py
+index 0352e8f..595fd4d 100644
+--- a/Xlib/display.py
++++ b/Xlib/display.py
+@@ -35,6 +35,9 @@ import xobject.fontable
+ import xobject.colormap
+ import xobject.cursor
+ 
++# Xlib.ext modules
++import ext.render
++
+ _resource_baseclasses = {
+     'resource': xobject.resource.Resource,
+     'drawable': xobject.drawable.Drawable,
+@@ -45,12 +48,15 @@ _resource_baseclasses = {
+     'gc': xobject.fontable.GC,
+     'colormap': xobject.colormap.Colormap,
+     'cursor': xobject.cursor.Cursor,
++    'picture': ext.render.Picture,
++    'glyphset': ext.render.GlyphSet,
+     }
+ 
+ _resource_hierarchy = {
+     'resource': ('drawable', 'window', 'pixmap',
+                  'fontable', 'font', 'gc',
+-                 'colormap', 'cursor'),
++                 'colormap', 'cursor',
++                 'picture', 'glyphset'),
+     'drawable': ('window', 'pixmap'),
+     'fontable': ('font', 'gc')
+     }
+diff --git a/Xlib/ext/__init__.py b/Xlib/ext/__init__.py
+index b25e43c..df7f36e 100644
+--- a/Xlib/ext/__init__.py
++++ b/Xlib/ext/__init__.py
+@@ -29,6 +29,7 @@ __extensions__ = [
+     ('RANDR', 'randr'),
+     ('XFIXES', 'xfixes'),
+     ('SECURITY', 'security'),
++    ('RENDER', 'render'),
+     ]
+ 
+ __all__ = map(lambda x: x[1], __extensions__)
+diff --git a/Xlib/protocol/rq.py b/Xlib/protocol/rq.py
+index 42152fa..3ad31a1 100644
+--- a/Xlib/protocol/rq.py
++++ b/Xlib/protocol/rq.py
+@@ -336,6 +336,14 @@ class Cursor(Resource):
+     cast_function = '__cursor__'
+     class_name = 'cursor'
+ 
++class Picture(Resource):
++    cast_function = '__picture__'
++    class_name = 'picture'
++
++class GlyphSet(Resource):
++    cast_function = '__glyphset__'
++    class_name = 'glyphset'
++
+ 
+ class Bool(ValueField):
+     structvalues = 1
