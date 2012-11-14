@@ -301,7 +301,7 @@ class ChangePicture(rq.Request):
         rq.Card8('opcode'),
         rq.Opcode(5),
         rq.RequestLength(),
-        rq.Picture('pid'),
+        rq.Picture('picture'),
         PictureValues('values'),
         )
 
@@ -323,7 +323,7 @@ class FreePicture(rq.Request):
         rq.Card8('opcode'),
         rq.Opcode(7),
         rq.RequestLength(),
-        rq.Picture('pid'),
+        rq.Picture('picture'),
         )
 
 
@@ -915,7 +915,7 @@ class Picture(resource.Resource):
         ChangePicture(
             display = self.display,
             opcode = self.display.get_extension_major(extname),
-            pid = self,
+            picture = self,
             values = keys,
             )
 
@@ -983,7 +983,7 @@ class Picture(resource.Resource):
         FreePicture(
             display = self.display,
             opcode = self.display.get_extension_major(extname),
-            pid = self,
+            picture = self,
             )
 
 
