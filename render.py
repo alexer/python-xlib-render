@@ -18,6 +18,8 @@ class Fixed(rq.Card32):
     def parse_value(self, value, display):
         return value/float(2**16)
 
+FixedObj = Fixed(None)
+
 Indexed = 0
 Direct = 1
 
@@ -669,7 +671,7 @@ class SetPictureFilter(rq.Request):
         rq.LengthOf('filter', 2),
         rq.Pad(2),
         rq.String8('filter'),
-        rq.List('values', Fixed),
+        rq.List('values', FixedObj),
         )
 
 
@@ -737,7 +739,7 @@ class CreateLinearGradient(rq.Request):
         rq.Object('p1', PointFix),
         rq.Object('p2', PointFix),
         rq.LengthOf(('stops', 'stop_colors'), 4),
-        rq.List('stops', Fixed),
+        rq.List('stops', FixedObj),
         rq.List('stop_colors', Color),
         )
 
@@ -767,7 +769,7 @@ class CreateRadialGradient(rq.Request):
         Fixed('inner_radius'),
         Fixed('outer_radius'),
         rq.LengthOf(('stops', 'stop_colors'), 4),
-        rq.List('stops', Fixed),
+        rq.List('stops', FixedObj),
         rq.List('stop_colors', Color),
         )
 
@@ -797,7 +799,7 @@ class CreateConicalGradient(rq.Request):
         rq.Object('center', PointFix),
         Fixed('angle'),
         rq.LengthOf(('stops', 'stop_colors'), 4),
-        rq.List('stops', Fixed),
+        rq.List('stops', FixedObj),
         rq.List('stop_colors', Color),
         )
 
