@@ -1,8 +1,8 @@
 diff --git a/Xlib/protocol/rq.py b/Xlib/protocol/rq.py
-index 3ad31a1..cad8baf 100644
+index 42152fa..2cee58d 100644
 --- a/Xlib/protocol/rq.py
 +++ b/Xlib/protocol/rq.py
-@@ -554,8 +554,6 @@ class FixedList(List):
+@@ -546,8 +546,6 @@ class FixedList(List):
  
  
  class Object(ValueField):
@@ -11,7 +11,7 @@ index 3ad31a1..cad8baf 100644
      def __init__(self, name, type, default = None):
          ValueField.__init__(self, name, default)
          self.type = type
-@@ -563,55 +561,29 @@ class Object(ValueField):
+@@ -555,41 +553,26 @@ class Object(ValueField):
          self.structvalues = self.type.structvalues
  
      def parse_binary_value(self, data, display, length, format):
@@ -51,34 +51,30 @@ index 3ad31a1..cad8baf 100644
 -        if self.type.structcode is None:
 -            return val
 -
--        if type(val) is types.TupleType:
+         if type(val) is types.TupleType:
 -            return val
--
--        if type(val) is types.DictType:
--            data = val
--        elif isinstance(val, DictWrapper):
--            data = val._data
--        else:
--            raise TypeError('Object value must be tuple, dictionary or DictWrapper: %s' % val)
-+        if type(val) is not types.TupleType:
-+            if type(val) is types.DictType:
-+                data = val
-+            elif isinstance(val, DictWrapper):
-+                data = val._data
-+            else:
-+                raise TypeError('Object value must be tuple, dictionary or DictWrapper: %s' % val)
- 
--        vals = []
--        for f in self.type.fields:
--            if f.name:
--                vals.append(data[f.name])
-+            val = []
++            vals = []
++            i = 0
 +            for f in self.type.fields:
 +                if f.name:
-+                    val.append(data[f.name])
++                    if f.check_value is None:
++                        vals.append(val[i])
++                    else:
++                        vals.append(f.check_value(val[i]))
++                    i = i + 1
++            return vals
  
--        return vals
-+        return [field.check_value(value) if field.check_value else value for field, value in zip(self.type.fields, val)]
+         if type(val) is types.DictType:
+             data = val
+@@ -601,7 +584,10 @@ class Object(ValueField):
+         vals = []
+         for f in self.type.fields:
+             if f.name:
+-                vals.append(data[f.name])
++                if f.check_value is None:
++                    vals.append(data[f.name])
++                else:
++                    vals.append(f.check_value(data[f.name]))
  
+         return vals
  
- class PropertyData(ValueField):
