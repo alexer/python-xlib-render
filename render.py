@@ -347,25 +347,6 @@ class Composite(rq.Request):
         rq.Card16('height'),
         )
 
-# XXX: method of picture
-def composite(self, op, src, mask, dst, src_x, src_y, mask_x, mask_y, dst_x, dst_y, width, height):
-    return Composite(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        mask = mask,
-        dst = dst,
-        src_x = src_x,
-        src_y = src_y,
-        mask_x = mask_x,
-        mask_y = mask_y,
-        dst_x = dst_x,
-        dst_y = dst_y,
-        width = width,
-        height = height,
-        )
-
 
 # XXX: Untested (not in spec)
 class Scale(rq.Request):
@@ -385,23 +366,6 @@ class Scale(rq.Request):
         rq.Card16('height'),
         )
 
-# XXX: method of picture
-def scale(self, src, dst, color_scale, alpha_scale, src_x, src_y, dst_x, dst_y, width, height):
-    return Scale(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        src = src,
-        dst = dst,
-        color_scale = color_scale,
-        alpha_scale = alpha_scale,
-        src_x = src_x,
-        src_y = src_y,
-        dst_x = dst_x,
-        dst_y = dst_y,
-        width = width,
-        height = height
-        )
-
 
 # The Trapezoids request is deprecated
 class Trapezoids(rq.Request):
@@ -417,20 +381,6 @@ class Trapezoids(rq.Request):
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.List('traps', Trapezoid), # XXX: The point structures are inlined into lines
-        )
-
-# XXX: method of picture
-def trapezoids(self, op, src, dst, mask_format, src_x, src_y, *traps):
-    Trapezoids(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        src_x = src_x,
-        src_y = src_y,
-        traps = traps,
         )
 
 
@@ -449,20 +399,6 @@ class Triangles(rq.Request):
         rq.List('triangles', Triangle),
         )
 
-# XXX: method of picture
-def triangles(self, op, src, dst, mask_format, src_x, src_y, *triangles):
-    Triangles(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        src_x = src_x,
-        src_y = src_y,
-        triangles = triangles,
-        )
-
 
 class TriStrip(rq.Request):
     _request = rq.Struct(
@@ -479,20 +415,6 @@ class TriStrip(rq.Request):
         rq.List('points', PointFix),
         )
 
-# XXX: method of picture
-def tri_strip(self, op, src, dst, mask_format, src_x, src_y, *points):
-    TriStrip(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        src_x = src_x,
-        src_y = src_y,
-        points = points,
-        )
-
 
 class TriFan(rq.Request):
     _request = rq.Struct(
@@ -507,20 +429,6 @@ class TriFan(rq.Request):
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.List('points', PointFix),
-        )
-
-# XXX: method of picture
-def tri_fan(self, op, src, dst, mask_format, src_x, src_y, *points):
-    TriFan(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        src_x = src_x,
-        src_y = src_y,
-        points = points,
         )
 
 
@@ -987,6 +895,93 @@ class Picture(resource.Resource):
             )
 
 
+    def composite(self, op, src, mask, src_x, src_y, mask_x, mask_y, dst_x, dst_y, width, height):
+        Composite(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            mask = mask,
+            dst = self,
+            src_x = src_x,
+            src_y = src_y,
+            mask_x = mask_x,
+            mask_y = mask_y,
+            dst_x = dst_x,
+            dst_y = dst_y,
+            width = width,
+            height = height,
+            )
+
+    def scale(self, src, color_scale, alpha_scale, src_x, src_y, dst_x, dst_y, width, height):
+        Scale(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            src = src,
+            dst = self,
+            color_scale = color_scale,
+            alpha_scale = alpha_scale,
+            src_x = src_x,
+            src_y = src_y,
+            dst_x = dst_x,
+            dst_y = dst_y,
+            width = width,
+            height = height
+            )
+
+    def trapezoids(self, op, src, mask_format, src_x, src_y, *traps):
+        Trapezoids(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            src_x = src_x,
+            src_y = src_y,
+            traps = traps,
+            )
+
+    def triangles(self, op, src, mask_format, src_x, src_y, *triangles):
+        Triangles(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            src_x = src_x,
+            src_y = src_y,
+            triangles = triangles,
+            )
+
+    def tri_strip(self, op, src, mask_format, src_x, src_y, *points):
+        TriStrip(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            src_x = src_x,
+            src_y = src_y,
+            points = points,
+            )
+
+    def tri_fan(self, op, src, mask_format, src_x, src_y, *points):
+        TriFan(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            src_x = src_x,
+            src_y = src_y,
+            points = points,
+            )
+
+
 class GlyphSet(resource.Resource):
     __glyphset__ = resource.Resource.__resource__
 
@@ -1033,12 +1028,6 @@ def init(disp, info):
     disp.extension_add_method('display', 'render_query_pict_index_values', query_pict_index_values)
     disp.extension_add_method('drawable', 'render_query_filters', query_filters)
     disp.extension_add_method('drawable', 'create_picture', create_picture)
-    disp.extension_add_method('display', 'render_composite', composite)
-    disp.extension_add_method('display', 'render_scale', scale)
-    disp.extension_add_method('display', 'render_trapezoids', trapezoids)
-    disp.extension_add_method('display', 'render_triangles', triangles)
-    disp.extension_add_method('display', 'render_tri_strip', tri_strip)
-    disp.extension_add_method('display', 'render_tri_fan', tri_fan)
     disp.extension_add_method('display', 'create_glyph_set', create_glyph_set)
     disp.extension_add_method('display', 'composite_glyphs_8', composite_glyphs_8)
     disp.extension_add_method('display', 'composite_glyphs_16', composite_glyphs_16)
