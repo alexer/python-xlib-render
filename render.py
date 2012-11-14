@@ -1028,83 +1028,24 @@ class GlyphSet(resource.Resource):
 
 
 def init(disp, info):
-    disp.extension_add_method('display',
-                              'render_query_version',
-                              query_version)
-
-    disp.extension_add_method('display',
-                              'render_query_pict_formats',
-                              query_pict_formats)
-
-    disp.extension_add_method('display',
-                              'render_query_pict_index_values',
-                              query_pict_index_values)
-
-    disp.extension_add_method('drawable',
-                              'render_query_filters',
-                              query_filters)
-
-    disp.extension_add_method('drawable',
-                              'create_picture',
-                              create_picture)
-
-    disp.extension_add_method('display',
-                              'render_composite',
-                              composite)
-
-    disp.extension_add_method('display',
-                              'render_scale',
-                              scale)
-
-    disp.extension_add_method('display',
-                              'render_trapezoids',
-                              trapezoids)
-
-    disp.extension_add_method('display',
-                              'render_triangles',
-                              triangles)
-
-    disp.extension_add_method('display',
-                              'render_tri_strip',
-                              tri_strip)
-
-    disp.extension_add_method('display',
-                              'render_tri_fan',
-                              tri_fan)
-
-    disp.extension_add_method('display',
-                              'create_glyph_set',
-                              create_glyph_set)
-
-    disp.extension_add_method('display',
-                              'composite_glyphs_8',
-                              composite_glyphs_8)
-
-    disp.extension_add_method('display',
-                              'composite_glyphs_16',
-                              composite_glyphs_16)
-
-    disp.extension_add_method('display',
-                              'composite_glyphs_32',
-                              composite_glyphs_32)
-
-    disp.extension_add_method('display',
-                              'create_anim_cursor',
-                              create_anim_cursor)
-
-    disp.extension_add_method('display',
-                              'create_solid_fill',
-                              create_solid_fill)
-
-    disp.extension_add_method('display',
-                              'create_linear_gradient',
-                              create_linear_gradient)
-
-    disp.extension_add_method('display',
-                              'create_radial_gradient',
-                              create_radial_gradient)
-
-    disp.extension_add_method('display',
-                              'create_conical_gradient',
-                              create_conical_gradient)
+    disp.extension_add_method('display', 'render_query_version', query_version)
+    disp.extension_add_method('display', 'render_query_pict_formats', query_pict_formats)
+    disp.extension_add_method('display', 'render_query_pict_index_values', query_pict_index_values)
+    disp.extension_add_method('drawable', 'render_query_filters', query_filters)
+    disp.extension_add_method('drawable', 'create_picture', create_picture)
+    disp.extension_add_method('display', 'render_composite', composite)
+    disp.extension_add_method('display', 'render_scale', scale)
+    disp.extension_add_method('display', 'render_trapezoids', trapezoids)
+    disp.extension_add_method('display', 'render_triangles', triangles)
+    disp.extension_add_method('display', 'render_tri_strip', tri_strip)
+    disp.extension_add_method('display', 'render_tri_fan', tri_fan)
+    disp.extension_add_method('display', 'create_glyph_set', create_glyph_set)
+    disp.extension_add_method('display', 'composite_glyphs_8', composite_glyphs_8)
+    disp.extension_add_method('display', 'composite_glyphs_16', composite_glyphs_16)
+    disp.extension_add_method('display', 'composite_glyphs_32', composite_glyphs_32)
+    disp.extension_add_method('display', 'create_anim_cursor', create_anim_cursor)
+    disp.extension_add_method('display', 'create_solid_fill', create_solid_fill)
+    disp.extension_add_method('display', 'create_linear_gradient', create_linear_gradient)
+    disp.extension_add_method('display', 'create_radial_gradient', create_radial_gradient)
+    disp.extension_add_method('display', 'create_conical_gradient', create_conical_gradient)
 
