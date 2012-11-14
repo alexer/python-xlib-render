@@ -201,12 +201,12 @@ class QueryVersion(rq.ReplyRequest):
             rq.Pad(16),
             )
 
-def query_version(self, major, minor):
+def query_version(self):
     return QueryVersion(
         display = self.display,
         opcode = self.display.get_extension_major(extname),
-        major_version = major,
-        minor_version = minor,
+        major_version = 0,
+        minor_version = 11,
         )
 
 
