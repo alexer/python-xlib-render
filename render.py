@@ -523,20 +523,6 @@ class CompositeGlyphs8(rq.Request):
         rq.List('glyphcmds', GlyphElt8), # XXX: GlyphItem8
         )
 
-def composite_glyphs_8(self, op, src, dst, mask_format, glyphset, src_x, src_y, *glyphcmds):
-    CompositeGlyphs8(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        glyphset = glyphset,
-        src_x = src_x,
-        src_y = src_y,
-        glyphcmds = glyphcmds,
-        )
-
 
 class CompositeGlyphs16(rq.Request):
     _request = rq.Struct(
@@ -554,20 +540,6 @@ class CompositeGlyphs16(rq.Request):
         rq.List('glyphcmds', GlyphElt16), # XXX: GlyphItem16
         )
 
-def composite_glyphs_16(self, op, src, dst, mask_format, glyphset, src_x, src_y, *glyphcmds):
-    CompositeGlyphs16(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        glyphset = glyphset,
-        src_x = src_x,
-        src_y = src_y,
-        glyphcmds = glyphcmds,
-        )
-
 
 class CompositeGlyphs32(rq.Request):
     _request = rq.Struct(
@@ -583,20 +555,6 @@ class CompositeGlyphs32(rq.Request):
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.List('glyphcmds', GlyphElt32), # XXX: GlyphItem32
-        )
-
-def composite_glyphs_32(self, op, src, dst, mask_format, glyphset, src_x, src_y, *glyphcmds):
-    CompositeGlyphs32(
-        display = self.display,
-        opcode = self.display.get_extension_major(extname),
-        op = op,
-        src = src,
-        dst = dst,
-        mask_format = mask_format,
-        glyphset = glyphset,
-        src_x = src_x,
-        src_y = src_y,
-        glyphcmds = glyphcmds,
         )
 
 
@@ -983,6 +941,58 @@ class Picture(resource.Resource):
             points = points,
             )
 
+    def composite_glyphs_8(self, op, src, mask_format, glyphset, src_x, src_y, *glyphcmds):
+        CompositeGlyphs8(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            glyphset = glyphset,
+            src_x = src_x,
+            src_y = src_y,
+            glyphcmds = glyphcmds,
+            )
+
+    def composite_glyphs_16(self, op, src, mask_format, glyphset, src_x, src_y, *glyphcmds):
+        CompositeGlyphs16(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            glyphset = glyphset,
+            src_x = src_x,
+            src_y = src_y,
+            glyphcmds = glyphcmds,
+            )
+
+    def composite_glyphs_32(self, op, src, mask_format, glyphset, src_x, src_y, *glyphcmds):
+        CompositeGlyphs32(
+            display = self.display,
+            opcode = self.display.get_extension_major(extname),
+            op = op,
+            src = src,
+            dst = self,
+            mask_format = mask_format,
+            glyphset = glyphset,
+            src_x = src_x,
+            src_y = src_y,
+            glyphcmds = glyphcmds,
+            )
+
+    def composite_glyphs(self, op, src, mask_format, glyphset, src_x, src_y, *glyphcmds):
+        max_glyph = max(glyph for dx, dy, glyphs in glyphcmds for glyph in glyphs)
+        if max_glyph < 256:
+            func = self.composite_glyphs_8
+        elif max_glyph < 65536:
+            func = self.composite_glyphs_16
+        else:
+            func = self.composite_glyphs_32
+        func(op, src, mask_format, glyphset, src_x, src_y, *glyphcmds)
+
 
 class GlyphSet(resource.Resource):
     __glyphset__ = resource.Resource.__resource__
@@ -1031,9 +1041,6 @@ def init(disp, info):
     disp.extension_add_method('drawable', 'render_query_filters', query_filters)
     disp.extension_add_method('drawable', 'create_picture', create_picture)
     disp.extension_add_method('display', 'create_glyph_set', create_glyph_set)
-    disp.extension_add_method('display', 'composite_glyphs_8', composite_glyphs_8)
-    disp.extension_add_method('display', 'composite_glyphs_16', composite_glyphs_16)
-    disp.extension_add_method('display', 'composite_glyphs_32', composite_glyphs_32)
     disp.extension_add_method('display', 'create_anim_cursor', create_anim_cursor)
     disp.extension_add_method('display', 'create_solid_fill', create_solid_fill)
     disp.extension_add_method('display', 'create_linear_gradient', create_linear_gradient)
