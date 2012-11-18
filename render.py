@@ -609,7 +609,7 @@ class QueryFilters(rq.ReplyRequest):
         rq.LengthOf('filters', 4),
         rq.Pad(4),
         rq.List('aliases', rq.Card16),
-        rq.List('filters', rq.Struct(rq.LengthOf('string', 1), rq.String8('string', pad=0))), # XXX: This yields dictionaries, we want strings
+        rq.List('filters', rq.Str),
         )
 
 def query_filters(self):
