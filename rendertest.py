@@ -135,7 +135,7 @@ hue = dpy.create_conical_gradient((50, 50), 0, (0/6., (65535, 0, 0, 65535)), (1/
 pixmap = win.create_pixmap(100, 100, 32)
 img = pixmap.create_picture(fmt_argb32)
 # OP 29, QueryFilters
-print pixmap.render_query_filters()
+res = pixmap.render_query_filters()
 pixmap.free()
 
 pixmap = win.create_pixmap(100, 100, 32)
@@ -149,8 +149,8 @@ pixmap.free()
 mask.fill_rectangles(0, (0, 0, 0, 0), (0, 0, 100, 100))
 # OP 32, AddTraps
 mask.add_traps(10, 10, ((10, 30, 0), (0, 40, 20)), ((0, 40, 20), (10, 30, 40)))
-# OP 30, SetPictureFilter
-mask.set_filter('convolution', 7, 7, *[1./(7*7) for i in range(49)])
+if 'convolution' in res.filters:
+	mask.set_filter('convolution', 7, 7, *[1./(7*7) for i in range(49)])
 
 img.fill_rectangles(0, (0, 0, 0, 0), (0, 0, 100, 100))
 # OP 6, SetPictureClipRectangles
@@ -166,6 +166,8 @@ img2.composite(3, hue, mask, 20, 20, 0, 0, 0, 0, 60, 60)
 
 # OP 28, SetPictureTransform
 mask.set_transform((1, 0.2, 0, 0, 1, 0, 0, 0, 1))
+# OP 30, SetPictureFilter
+mask.set_filter('good')
 
 while 1:
 	ev = dpy.next_event()
