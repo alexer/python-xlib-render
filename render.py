@@ -654,7 +654,6 @@ def create_anim_cursor(self, cursors):
     return cls(self.display, cid, owner = 1)
 
 
-# XXX: Untested
 class AddTraps(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
