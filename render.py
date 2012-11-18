@@ -380,7 +380,7 @@ class Trapezoids(rq.Request):
         PictFormat('mask_format', (X.NONE, )),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
-        rq.List('traps', Trapezoid), # XXX: The point structures are inlined into lines
+        rq.List('traps', Trapezoid),
         )
 
 
