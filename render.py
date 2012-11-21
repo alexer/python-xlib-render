@@ -5,6 +5,9 @@
 #
 """Rendering extension"""
 
+import struct
+import types
+
 from Xlib import X
 from Xlib.protocol import rq, structs
 from Xlib.xobject import drawable, resource, cursor
@@ -150,7 +153,7 @@ GlyphElt32 = rq.Struct(
     rq.Int16('dy'),
     rq.List('glyphs', rq.Card32),
     )
-# XXX: GlyphItemN = GlyphEltN(...) OR GlyphEltN(size=0xff)+GlyphSet
+# XXX: List or StringN?
 SpanFix = rq.Struct(
     Fixed('left'),
     Fixed('right'),
@@ -160,6 +163,85 @@ Trap = rq.Struct(
     rq.Object('top', SpanFix),
     rq.Object('bottom', SpanFix),
     )
+
+class GlyphItems(rq.ValueField):
+    glyphelt = None
+    def pack_value(self, value):
+        data = ''
+        args = {}
+
+        for v in value:
+            # Let values be simple strings, meaning a delta of 0
+            if type(v) is types.StringType:
+                v = (0, 0, v)
+
+            # A tuple, it should be (deltax, deltay, string)
+            # Encode it as one or more textitems
+
+            if type(v) in (types.TupleType, types.DictType) or \
+               isinstance(v, rq.DictWrapper):
+
+                if type(v) is types.TupleType:
+                    deltax, deltay, str = v
+                else:
+                    # XXX: This + GlyphEltN; d or delta?
+                    deltax = v['dx']
+                    deltay = v['dy']
+                    str = v['glyphs']
+
+                while deltax or deltay or str:
+                    args['dx'] = deltax
+                    args['dy'] = deltay
+                    args['glyphs'] = str[:254]
+
+                    data = data + apply(self.glyphelt.to_binary, (), args)
+
+                    deltax = deltay = 0
+                    str = str[254:]
+
+            # Else an integer, i.e. a font change
+            else:
+                # Use fontable cast function if instance
+                if type(v) is types.InstanceType:
+                    v = v.__glyphset__()
+
+                data = data + struct.pack('<B3xHHL', 255, 0, 0, v)
+
+        # Pad out to four byte length
+        dlen = len(data)
+        return data + '\0' * ((4 - dlen % 4) % 4), None, None
+
+    def parse_binary_value(self, data, display, length, format):
+        values = []
+        while 1:
+            if len(data) < 2:
+                break
+
+            # font change
+            if ord(data[0]) == 255:
+                # XXX: Make it a GlyphSet?
+                values.append(struct.unpack('>L', str(data[8:12]))[0])
+                data = buffer(data, 12)
+
+            # string with delta
+            else:
+                v, data = self.glyphelt.parse_binary(data, display)
+                values.append(v)
+
+        return values, ''
+
+
+class GlyphItems8(GlyphItems):
+    glyphelt = GlyphElt8
+
+
+class GlyphItems16(GlyphItems):
+    glyphelt = GlyphElt16
+
+
+class GlyphItems32(GlyphItems):
+    glyphelt = GlyphElt32
+
 
 def PictOp(arg):
     return rq.Set(arg, 1, tuple(range(0x00, 0x0d+1) + range(0x10, 0x1b+1) + range(0x20, 0x2b+1) + range(0x30, 0x3e+1)))
@@ -526,7 +608,7 @@ class CompositeGlyphs8(rq.Request):
         rq.GlyphSet('glyphset'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
-        rq.List('glyphcmds', GlyphElt8), # XXX: GlyphItem8
+        GlyphItems8('glyphcmds'),
         )
 
 
@@ -543,7 +625,7 @@ class CompositeGlyphs16(rq.Request):
         rq.GlyphSet('glyphset'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
-        rq.List('glyphcmds', GlyphElt16), # XXX: GlyphItem16
+        GlyphItems16('glyphcmds'),
         )
 
 
@@ -560,7 +642,7 @@ class CompositeGlyphs32(rq.Request):
         rq.GlyphSet('glyphset'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
-        rq.List('glyphcmds', GlyphElt32), # XXX: GlyphItem32
+        GlyphItems32('glyphcmds'),
         )
 
 
@@ -989,13 +1071,29 @@ class Picture(resource.Resource):
             )
 
     def composite_glyphs(self, op, src, mask_format, glyphset, src_x, src_y, *glyphcmds):
-        max_glyph = max(glyph for dx, dy, glyphs in glyphcmds for glyph in glyphs)
+        max_glyph = 0
+        for glyphcmd in glyphcmds:
+            if type(glyphcmd) is types.TupleType:
+                deltax, deltay, glyphs = glyphcmd
+            elif type(glyphcmd) is types.DictType or isinstance(glyphcmd, rq.DictWrapper):
+                glyphs = glyphcmd['glyphs']
+            else:
+                glyphs = []
+
+            if glyphs:
+                glyphs = max(glyphs)
+            else:
+                glyphs = 0
+
+            max_glyph = max(max_glyph, glyphs)
+
         if max_glyph < 256:
             func = self.composite_glyphs_8
         elif max_glyph < 65536:
             func = self.composite_glyphs_16
         else:
             func = self.composite_glyphs_32
+
         func(op, src, mask_format, glyphset, src_x, src_y, *glyphcmds)
 
 

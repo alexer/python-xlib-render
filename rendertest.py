@@ -177,7 +177,7 @@ while 1:
 			# OP 23, CompositeGlyphs8
 			# OP 24, CompositeGlyphs16
 			# OP 25, CompositeGlyphs32
-			func(3, gradient, X.NONE, font, 0, 0, (20, 15 + 20 * i, map(ord, 'Hello, world!')))
+			func(3, gradient, X.NONE, font, 0, 0, (20, 15 + 20 * i, map(ord, 'Hello, world!')), font, (-50, 10, map(ord, '---')))
 		# OP 26, FillRectangles
 		pict.fill_rectangles(3, (65535, 32767, 0, 65535), (120, 10, 20, 20), (120, 40, 20, 20))
 		# OP 10, Trapezoids
