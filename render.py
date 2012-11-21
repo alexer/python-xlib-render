@@ -135,22 +135,22 @@ GlyphInfo = rq.Struct(
 GlyphElt8 = rq.Struct(
     rq.LengthOf('glyphs', 1),
     rq.Pad(3),
-    rq.Int16('dx'),
-    rq.Int16('dy'),
+    rq.Int16('deltax'),
+    rq.Int16('deltay'),
     rq.List('glyphs', rq.Card8),
     )
 GlyphElt16 = rq.Struct(
     rq.LengthOf('glyphs', 1),
     rq.Pad(3),
-    rq.Int16('dx'),
-    rq.Int16('dy'),
+    rq.Int16('deltax'),
+    rq.Int16('deltay'),
     rq.List('glyphs', rq.Card16),
     )
 GlyphElt32 = rq.Struct(
     rq.LengthOf('glyphs', 1),
     rq.Pad(3),
-    rq.Int16('dx'),
-    rq.Int16('dy'),
+    rq.Int16('deltax'),
+    rq.Int16('deltay'),
     rq.List('glyphs', rq.Card32),
     )
 # XXX: List or StringN?
@@ -184,14 +184,13 @@ class GlyphItems(rq.ValueField):
                 if type(v) is types.TupleType:
                     deltax, deltay, str = v
                 else:
-                    # XXX: This + GlyphEltN; d or delta?
-                    deltax = v['dx']
-                    deltay = v['dy']
+                    deltax = v['deltax']
+                    deltay = v['deltay']
                     str = v['glyphs']
 
                 while deltax or deltay or str:
-                    args['dx'] = deltax
-                    args['dy'] = deltay
+                    args['deltax'] = deltax
+                    args['deltay'] = deltay
                     args['glyphs'] = str[:254]
 
                     data = data + apply(self.glyphelt.to_binary, (), args)
