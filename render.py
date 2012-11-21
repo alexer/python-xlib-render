@@ -204,6 +204,7 @@ class GlyphItems(rq.ValueField):
                 if type(v) is types.InstanceType:
                     v = v.__glyphset__()
 
+                # XXX: Endianness?
                 data = data + struct.pack('<B3xHHL', 255, 0, 0, v)
 
         # Pad out to four byte length
@@ -218,8 +219,8 @@ class GlyphItems(rq.ValueField):
 
             # font change
             if ord(data[0]) == 255:
-                # XXX: Make it a GlyphSet?
-                values.append(struct.unpack('>L', str(data[8:12]))[0])
+                # XXX: Make it a GlyphSet? Endianness?
+                values.append(struct.unpack('<L', str(data[8:12]))[0])
                 data = buffer(data, 12)
 
             # string with delta
