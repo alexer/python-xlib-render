@@ -507,6 +507,12 @@ class FreeGlyphs(rq.Request):
 # AddGlyphsFromPicture, opcode=21
 
 
+# The spec says that the glyphset argument of CompositeGlyphs* is
+# of type Glyphable, which means it's either GlyphSet or Fontable.
+# I tried GC and Font, but my X server just gave XError, so for now
+# I am assuming the spec is wrong/outdated and just used GlyphSet.
+
+
 class CompositeGlyphs8(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -517,7 +523,7 @@ class CompositeGlyphs8(rq.Request):
         rq.Picture('src'),
         rq.Picture('dst'),
         PictFormat('mask_format', (X.NONE, )),
-        rq.GlyphSet('glyphset'), # XXX: Glyphable
+        rq.GlyphSet('glyphset'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.List('glyphcmds', GlyphElt8), # XXX: GlyphItem8
@@ -534,7 +540,7 @@ class CompositeGlyphs16(rq.Request):
         rq.Picture('src'),
         rq.Picture('dst'),
         PictFormat('mask_format', (X.NONE, )),
-        rq.GlyphSet('glyphset'), # XXX: Glyphable
+        rq.GlyphSet('glyphset'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.List('glyphcmds', GlyphElt16), # XXX: GlyphItem16
@@ -551,7 +557,7 @@ class CompositeGlyphs32(rq.Request):
         rq.Picture('src'),
         rq.Picture('dst'),
         PictFormat('mask_format', (X.NONE, )),
-        rq.GlyphSet('glyphset'), # XXX: Glyphable
+        rq.GlyphSet('glyphset'),
         rq.Int16('src_x'),
         rq.Int16('src_y'),
         rq.List('glyphcmds', GlyphElt32), # XXX: GlyphItem32
