@@ -368,7 +368,7 @@ def PictureValues(arg):
         rq.Int16('clip_y_origin'),
         rq.Pixmap('clip_mask'),
         rq.Bool('graphics_exposures'),
-        rq.Set('subwindow_mode', 1, (0, 1)), # XXX
+        rq.Set('subwindow_mode', 1, (X.ClipByChildren, X.IncludeInferiors)),
         PolyEdge('poly_edge'),
         PolyMode('poly_mode'),
         Atom('dither'),
