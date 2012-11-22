@@ -145,31 +145,22 @@ def Repeat(arg):
     return rq.Set(arg, 1, (RepeatNone, RepeatNormal, RepeatPad, RepeatReflect))
 
 
+ChannelMask = rq.Struct(
+    rq.Card16('shift'),
+    rq.Card16('mask'),
+    )
 DirectFormat = rq.Struct(
-    rq.Card16('red_shift'),
-    rq.Card16('red_mask'),
-    rq.Card16('green_shift'),
-    rq.Card16('green_mask'),
-    rq.Card16('blue_shift'),
-    rq.Card16('blue_mask'),
-    rq.Card16('alpha_shift'),
-    rq.Card16('alpha_mask'),
+    rq.Object('red', ChannelMask),
+    rq.Object('green', ChannelMask),
+    rq.Object('blue', ChannelMask),
+    rq.Object('alpha', ChannelMask),
     )
 PictFormInfo = rq.Struct(
     PictFormat('id'),
     PictType('type'),
     rq.Card8('depth'),
     rq.Pad(2),
-    #DirectFormat,
-    rq.Card16('red_shift'),
-    rq.Card16('red_mask'),
-    rq.Card16('green_shift'),
-    rq.Card16('green_mask'),
-    rq.Card16('blue_shift'),
-    rq.Card16('blue_mask'),
-    rq.Card16('alpha_shift'),
-    rq.Card16('alpha_mask'),
-
+    rq.Object('direct', DirectFormat),
     rq.Colormap('colormap', (X.NONE, )),
     )
 PictVisual = rq.Struct(

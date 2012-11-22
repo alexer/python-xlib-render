@@ -26,7 +26,12 @@ def render_find_format(dpy, **kwargs):
 	matches = []
 	for item in res.formats:
 		for key, value in kwargs.iteritems():
-			if item[key] != value:
+			if '_' in key:
+				key1, key2 = key.split('_')
+				val = item['direct'][key1][key2]
+			else:
+				val = item[key]
+			if val != value:
 				break
 		else:
 			matches.append(item)
