@@ -122,6 +122,7 @@ FixedObj = Fixed(None)
 VisualId = rq.Card32
 PictFormat = rq.Card32
 Atom = rq.Card32
+Pixel = rq.Card32
 
 def PictType(arg):
     return rq.Set(arg, 1, (PictTypeIndexed, PictTypeDirect))
@@ -180,7 +181,7 @@ PictScreen = rq.Struct(
     rq.List('depths', PictDepth),
     )
 IndexValue = rq.Struct(
-    rq.Card32('pixel'),
+    Pixel('pixel'),
     rq.Card16('red'),
     rq.Card16('green'),
     rq.Card16('blue'),
