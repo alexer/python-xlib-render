@@ -109,6 +109,7 @@ RepeatPad = 2
 RepeatReflect = 3
 
 
+# XXX: Int32
 class Fixed(rq.Card32):
     def check_value(self, value):
         return int(value*2**16)
@@ -120,9 +121,11 @@ FixedObj = Fixed(None)
 
 
 VisualId = rq.Card32
-PictFormat = rq.Card32
 Atom = rq.Card32
 Pixel = rq.Card32
+
+# Picture is a resource
+PictFormat = rq.Card32
 
 def PictType(arg):
     return rq.Set(arg, 1, (PictTypeIndexed, PictTypeDirect))
@@ -146,6 +149,12 @@ def Repeat(arg):
     return rq.Set(arg, 1, (RepeatNone, RepeatNormal, RepeatPad, RepeatReflect))
 
 
+Color = rq.Struct(
+    rq.Card16('red'),
+    rq.Card16('green'),
+    rq.Card16('blue'),
+    rq.Card16('alpha'),
+    )
 ChannelMask = rq.Struct(
     rq.Card16('shift'),
     rq.Card16('mask'),
@@ -155,6 +164,13 @@ DirectFormat = rq.Struct(
     rq.Object('green', ChannelMask),
     rq.Object('blue', ChannelMask),
     rq.Object('alpha', ChannelMask),
+    )
+IndexValue = rq.Struct(
+    Pixel('pixel'),
+    rq.Card16('red'),
+    rq.Card16('green'),
+    rq.Card16('blue'),
+    rq.Card16('alpha'),
     )
 PictFormInfo = rq.Struct(
     PictFormat('id'),
@@ -175,22 +191,13 @@ PictDepth = rq.Struct(
     rq.Pad(4),
     rq.List('visuals', PictVisual)
     )
+# XXX
 PictScreen = rq.Struct(
     rq.LengthOf('depths', 4),
     PictFormat('fallback'),
     rq.List('depths', PictDepth),
     )
-IndexValue = rq.Struct(
-    Pixel('pixel'),
-    rq.Card16('red'),
-    rq.Card16('green'),
-    rq.Card16('blue'),
-    rq.Card16('alpha'),
-    )
-AnimCursorElt = rq.Struct(
-    rq.Cursor('cursor'),
-    rq.Card32('delay'),
-    )
+# Fixed is defined above
 Transform = rq.Struct(
     Fixed('p11'),
     Fixed('p12'),
@@ -202,32 +209,41 @@ Transform = rq.Struct(
     Fixed('p32'),
     Fixed('p33'),
     )
-Color = rq.Struct(
-    rq.Card16('red'),
-    rq.Card16('green'),
-    rq.Card16('blue'),
-    rq.Card16('alpha'),
-    )
 PointFix = rq.Struct(
     Fixed('x'),
     Fixed('y'),
     )
 # PolyEdge, PolyMode and Repeat are defined above
+# XXX: ColorPoint
+SpanFix = rq.Struct(
+    Fixed('left'),
+    Fixed('right'),
+    Fixed('y'),
+    )
+# XXX: ColorSpanFix
+# XXX: Quad
+Triangle = rq.Struct(
+    rq.Object('p1', PointFix),
+    rq.Object('p2', PointFix),
+    rq.Object('p3', PointFix),
+    )
 LineFix = rq.Struct(
     rq.Object('p1', PointFix),
     rq.Object('p2', PointFix),
     )
+Trap = rq.Struct(
+    rq.Object('top', SpanFix),
+    rq.Object('bottom', SpanFix),
+    )
+# Deprecated
 Trapezoid = rq.Struct(
     Fixed('top'),
     Fixed('bottom'),
     rq.Object('left', LineFix),
     rq.Object('right', LineFix),
     )
-Triangle = rq.Struct(
-    rq.Object('p1', PointFix),
-    rq.Object('p2', PointFix),
-    rq.Object('p3', PointFix),
-    )
+# GlyphSet is a resource
+# XXX: Glyph
 GlyphInfo = rq.Struct(
     rq.Card16('width'),
     rq.Card16('height'),
@@ -236,6 +252,9 @@ GlyphInfo = rq.Struct(
     rq.Int16('off_x'),
     rq.Int16('off_y'),
     )
+# XXX: PictGlyph
+# XXX: Glyphable
+# XXX: List or StringN?
 GlyphElt8 = rq.Struct(
     rq.LengthOf('glyphs', 1),
     rq.Pad(3),
@@ -257,15 +276,9 @@ GlyphElt32 = rq.Struct(
     rq.Int16('deltay'),
     rq.List('glyphs', rq.Card32),
     )
-# XXX: List or StringN?
-SpanFix = rq.Struct(
-    Fixed('left'),
-    Fixed('right'),
-    Fixed('y'),
-    )
-Trap = rq.Struct(
-    rq.Object('top', SpanFix),
-    rq.Object('bottom', SpanFix),
+AnimCursorElt = rq.Struct(
+    rq.Cursor('cursor'),
+    rq.Card32('delay'),
     )
 
 class GlyphItems(rq.ValueField):
