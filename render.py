@@ -122,6 +122,23 @@ FixedObj = Fixed(None)
 VisualId = rq.Card32
 PictFormat = rq.Card32
 Atom = rq.Card32
+
+def PictType(arg):
+    return rq.Set(arg, 1, (PictTypeIndexed, PictTypeDirect))
+
+def PictOp(arg):
+    return rq.Set(arg, 1, (PictOpClear, PictOpSrc, PictOpDst, PictOpOver, PictOpOverReverse, PictOpIn, PictOpInReverse, PictOpOut, PictOpOutReverse, PictOpAtop, PictOpAtopReverse, PictOpXor, PictOpAdd, PictOpSaturate, PictOpDisjointClear, PictOpDisjointSrc, PictOpDisjointDst, PictOpDisjointOver, PictOpDisjointOverReverse, PictOpDisjointIn, PictOpDisjointInReverse, PictOpDisjointOut, PictOpDisjointOutReverse, PictOpDisjointAtop, PictOpDisjointAtopReverse, PictOpDisjointXor, PictOpConjointClear, PictOpConjointSrc, PictOpConjointDst, PictOpConjointOver, PictOpConjointOverReverse, PictOpConjointIn, PictOpConjointInReverse, PictOpConjointOut, PictOpConjointOutReverse, PictOpConjointAtop, PictOpConjointAtopReverse, PictOpConjointXor, PictOpMultiply, PictOpScreen, PictOpOverlay, PictOpDarken, PictOpLighten, PictOpColorDodge, PictOpColorBurn, PictOpHardLight, PictOpSoftLight, PictOpDifference, PictOpExclusion, PictOpHSLHue, PictOpHSLSaturation, PictOpHSLColor, PictOpHSLLuminosity))
+
+def PolyEdge(arg):
+    return rq.Set(arg, 1, (PolyEdgeSharp, PolyEdgeSmooth))
+
+def PolyMode(arg):
+    return rq.Set(arg, 1, (PolyModePrecise, PolyModeImprecise))
+
+def Repeat(arg):
+    return rq.Set(arg, 1, (RepeatNone, RepeatNormal, RepeatPad, RepeatReflect))
+
+
 Subpixel = rq.Struct(
     rq.Set('subpixel', 1, (0, 1, 2, 3, 4, 5)),
     rq.Card8('xxx'),
@@ -139,7 +156,7 @@ DirectFormat = rq.Struct(
     )
 PictFormInfo = rq.Struct(
     PictFormat('id'),
-    rq.Set('type', 1, (Indexed, Direct)),
+    PictType('type'),
     rq.Card8('depth'),
     rq.Pad(2),
     #DirectFormat,
@@ -202,6 +219,7 @@ PointFix = rq.Struct(
     Fixed('x'),
     Fixed('y'),
     )
+# PolyEdge, PolyMode and Repeat are defined above
 LineFix = rq.Struct(
     rq.Object('p1', PointFix),
     rq.Object('p2', PointFix),
@@ -336,12 +354,9 @@ class GlyphItems32(GlyphItems):
     glyphelt = GlyphElt32
 
 
-def PictOp(arg):
-    return rq.Set(arg, 1, tuple(range(0x00, 0x0d+1) + range(0x10, 0x1b+1) + range(0x20, 0x2b+1) + range(0x30, 0x3e+1)))
-
 def PictureValues(arg):
     return rq.ValueList(arg, 2, 2,
-        rq.Set('repeat', 1, (0, 1, 2, 3)),
+        Repeat('repeat'),
         rq.Picture('alpha_map'),
         rq.Int16('alpha_x_origin'),
         rq.Int16('alpha_y_origin'),
@@ -349,9 +364,9 @@ def PictureValues(arg):
         rq.Int16('clip_y_origin'),
         rq.Pixmap('clip_mask'),
         rq.Bool('graphics_exposures'),
-        rq.Set('subwindow_mode', 1, (0, 1)),
-        rq.Set('poly_edge', 1, (0, 1)),
-        rq.Set('poly_mode', 1, (0, 1)),
+        rq.Set('subwindow_mode', 1, (0, 1)), # XXX
+        PolyEdge('poly_edge'),
+        PolyMode('poly_mode'),
         Atom('dither'),
         rq.Bool('component_alpha'),
         )
