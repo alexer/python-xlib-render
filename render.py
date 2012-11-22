@@ -14,6 +14,101 @@ from Xlib.xobject import drawable, resource, cursor
 
 extname = 'RENDER'
 
+PictTypeIndexed = 0
+PictTypeDirect = 1
+
+PictOpClear = 0
+PictOpSrc = 1
+PictOpDst = 2
+PictOpOver = 3
+PictOpOverReverse = 4
+PictOpIn = 5
+PictOpInReverse = 6
+PictOpOut = 7
+PictOpOutReverse = 8
+PictOpAtop = 9
+PictOpAtopReverse = 10
+PictOpXor = 11
+PictOpAdd = 12
+PictOpSaturate = 13
+
+# Operators only available in version 0.2
+PictOpDisjointClear = 0x10
+PictOpDisjointSrc = 0x11
+PictOpDisjointDst = 0x12
+PictOpDisjointOver = 0x13
+PictOpDisjointOverReverse = 0x14
+PictOpDisjointIn = 0x15
+PictOpDisjointInReverse = 0x16
+PictOpDisjointOut = 0x17
+PictOpDisjointOutReverse = 0x18
+PictOpDisjointAtop = 0x19
+PictOpDisjointAtopReverse = 0x1a
+PictOpDisjointXor = 0x1b
+
+PictOpConjointClear = 0x20
+PictOpConjointSrc = 0x21
+PictOpConjointDst = 0x22
+PictOpConjointOver = 0x23
+PictOpConjointOverReverse = 0x24
+PictOpConjointIn = 0x25
+PictOpConjointInReverse = 0x26
+PictOpConjointOut = 0x27
+PictOpConjointOutReverse = 0x28
+PictOpConjointAtop = 0x29
+PictOpConjointAtopReverse = 0x2a
+PictOpConjointXor = 0x2b
+
+# Operators only available in version 0.11
+PictOpMultiply = 0x30
+PictOpScreen = 0x31
+PictOpOverlay = 0x32
+PictOpDarken = 0x33
+PictOpLighten = 0x34
+PictOpColorDodge = 0x35
+PictOpColorBurn = 0x36
+PictOpHardLight = 0x37
+PictOpSoftLight = 0x38
+PictOpDifference = 0x39
+PictOpExclusion = 0x3a
+PictOpHSLHue = 0x3b
+PictOpHSLSaturation = 0x3c
+PictOpHSLColor = 0x3d
+PictOpHSLLuminosity = 0x3e
+
+PolyEdgeSharp = 0
+PolyEdgeSmooth = 1
+
+PolyModePrecise = 0
+PolyModeImprecise = 1
+
+# Filters included in 0.6
+FilterNearest = "nearest"
+FilterBilinear = "bilinear"
+# Filters included in 0.10
+FilterConvolution = "convolution"
+
+FilterFast = "fast"
+FilterGood = "good"
+FilterBest = "best"
+
+FilterAliasNone = -1
+
+# Subpixel orders included in 0.6
+SubPixelUnknown = 0
+SubPixelHorizontalRGB = 1
+SubPixelHorizontalBGR = 2
+SubPixelVerticalRGB = 3
+SubPixelVerticalBGR = 4
+SubPixelNone = 5
+
+# Extended repeat attributes included in 0.10
+RepeatNone = 0
+RepeatNormal = 1
+RepeatPad = 2
+RepeatReflect = 3
+
+
 class Fixed(rq.Card32):
     def check_value(self, value):
         return int(value*2**16)
@@ -23,8 +118,6 @@ class Fixed(rq.Card32):
 
 FixedObj = Fixed(None)
 
-Indexed = 0
-Direct = 1
 
 VisualId = rq.Card32
 PictFormat = rq.Card32
