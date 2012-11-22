@@ -129,6 +129,12 @@ def PictType(arg):
 def PictOp(arg):
     return rq.Set(arg, 1, (PictOpClear, PictOpSrc, PictOpDst, PictOpOver, PictOpOverReverse, PictOpIn, PictOpInReverse, PictOpOut, PictOpOutReverse, PictOpAtop, PictOpAtopReverse, PictOpXor, PictOpAdd, PictOpSaturate, PictOpDisjointClear, PictOpDisjointSrc, PictOpDisjointDst, PictOpDisjointOver, PictOpDisjointOverReverse, PictOpDisjointIn, PictOpDisjointInReverse, PictOpDisjointOut, PictOpDisjointOutReverse, PictOpDisjointAtop, PictOpDisjointAtopReverse, PictOpDisjointXor, PictOpConjointClear, PictOpConjointSrc, PictOpConjointDst, PictOpConjointOver, PictOpConjointOverReverse, PictOpConjointIn, PictOpConjointInReverse, PictOpConjointOut, PictOpConjointOutReverse, PictOpConjointAtop, PictOpConjointAtopReverse, PictOpConjointXor, PictOpMultiply, PictOpScreen, PictOpOverlay, PictOpDarken, PictOpLighten, PictOpColorDodge, PictOpColorBurn, PictOpHardLight, PictOpSoftLight, PictOpDifference, PictOpExclusion, PictOpHSLHue, PictOpHSLSaturation, PictOpHSLColor, PictOpHSLLuminosity))
 
+def SubPixel(arg):
+    # XXX: Padding?
+    return rq.Set(arg, 1, (SubPixelUnknown, SubPixelHorizontalRGB, SubPixelHorizontalBGR, SubPixelVerticalRGB, SubPixelVerticalBGR, SubPixelNone))
+
+SubPixelObj = SubPixel(None)
+
 def PolyEdge(arg):
     return rq.Set(arg, 1, (PolyEdgeSharp, PolyEdgeSmooth))
 
@@ -139,11 +145,6 @@ def Repeat(arg):
     return rq.Set(arg, 1, (RepeatNone, RepeatNormal, RepeatPad, RepeatReflect))
 
 
-Subpixel = rq.Struct(
-    rq.Set('subpixel', 1, (0, 1, 2, 3, 4, 5)),
-    rq.Card8('xxx'),
-    rq.Pad(2),
-    )
 DirectFormat = rq.Struct(
     rq.Card16('red_shift'),
     rq.Card16('red_mask'),
@@ -420,7 +421,7 @@ class QueryPictFormats(rq.ReplyRequest):
         rq.Pad(4),
         rq.List('formats', PictFormInfo),
         rq.List('screens', PictScreen),
-        rq.List('subpixels', Subpixel),
+        rq.List('subpixels', SubPixelObj),
         )
 
 def query_pict_formats(self):
