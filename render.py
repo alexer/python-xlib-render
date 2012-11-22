@@ -213,14 +213,14 @@ PointFix = rq.Struct(
     Fixed('y'),
     )
 # PolyEdge, PolyMode and Repeat are defined above
-# XXX: ColorPoint
+#ColorPoint
 SpanFix = rq.Struct(
     Fixed('left'),
     Fixed('right'),
     Fixed('y'),
     )
-# XXX: ColorSpanFix
-# XXX: Quad
+#ColorSpanFix
+#Quad
 Triangle = rq.Struct(
     rq.Object('p1', PointFix),
     rq.Object('p2', PointFix),
@@ -242,7 +242,6 @@ Trapezoid = rq.Struct(
     rq.Object('right', LineFix),
     )
 # GlyphSet is a resource
-# XXX: Glyph
 GlyphInfo = rq.Struct(
     rq.Card16('width'),
     rq.Card16('height'),
@@ -251,8 +250,8 @@ GlyphInfo = rq.Struct(
     rq.Int16('off_x'),
     rq.Int16('off_y'),
     )
-# XXX: PictGlyph
-# XXX: Glyphable
+#PictGlyph
+# Glyphable would be a resource (see comment above CompositeGlyphs8)
 # XXX: List or StringN?
 GlyphElt8 = rq.Struct(
     rq.LengthOf('glyphs', 1),
@@ -464,8 +463,7 @@ def query_pict_index_values(self, format):
         )
 
 
-# XXX: Not implemented (not in spec)
-# QueryDithers, opcode=3
+#QueryDithers, opcode=3 (not in spec)
 
 
 class CreatePicture(rq.Request):
@@ -545,7 +543,7 @@ class Composite(rq.Request):
         )
 
 
-# XXX: Untested (not in spec)
+# Untested (not in spec)
 class Scale(rq.Request):
     _request = rq.Struct(
         rq.Card8('opcode'),
@@ -629,10 +627,9 @@ class TriFan(rq.Request):
         )
 
 
-# XXX: Not implemented (not in spec)
-# ColorTrapezoids, opcode=14
-# ColorTriangles, opcode=15
-## Transform, opcode=16
+#ColorTrapezoids, opcode=14 (not in spec)
+#ColorTriangles, opcode=15 (not in spec)
+#Transform, opcode=16 (not in spec)
 
 
 class CreateGlyphSet(rq.Request):
@@ -698,8 +695,7 @@ class FreeGlyphs(rq.Request):
         )
 
 
-# XXX: Not implemented (not in spec)
-# AddGlyphsFromPicture, opcode=21
+#AddGlyphsFromPicture, opcode=21 (not in spec)
 
 
 # The spec says that the glyphset argument of CompositeGlyphs* is
