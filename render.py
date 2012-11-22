@@ -1138,15 +1138,15 @@ class GlyphSet(resource.Resource):
 
 
 def init(disp, info):
-    disp.extension_add_method('display', 'render_query_version', query_version)
-    disp.extension_add_method('display', 'render_query_pict_formats', query_pict_formats)
-    disp.extension_add_method('display', 'render_query_pict_index_values', query_pict_index_values)
-    disp.extension_add_method('drawable', 'render_query_filters', query_filters)
-    disp.extension_add_method('drawable', 'create_picture', create_picture)
-    disp.extension_add_method('display', 'create_glyph_set', create_glyph_set)
-    disp.extension_add_method('display', 'create_anim_cursor', create_anim_cursor)
-    disp.extension_add_method('display', 'create_solid_fill', create_solid_fill)
-    disp.extension_add_method('display', 'create_linear_gradient', create_linear_gradient)
-    disp.extension_add_method('display', 'create_radial_gradient', create_radial_gradient)
-    disp.extension_add_method('display', 'create_conical_gradient', create_conical_gradient)
+    disp.extension_add_method('display', 'xrender_query_version', query_version)
+    disp.extension_add_method('display', 'xrender_query_pict_formats', query_pict_formats)
+    disp.extension_add_method('display', 'xrender_query_pict_index_values', query_pict_index_values)
+    disp.extension_add_method('drawable', 'xrender_query_filters', query_filters)
+    disp.extension_add_method('drawable', 'xrender_create_picture', create_picture)
+    disp.extension_add_method('display', 'xrender_create_glyph_set', create_glyph_set)
+    disp.extension_add_method('display', 'xrender_create_anim_cursor', create_anim_cursor)
+    disp.extension_add_method('display', 'xrender_create_solid_fill', create_solid_fill)
+    disp.extension_add_method('display', 'xrender_create_linear_gradient', create_linear_gradient)
+    disp.extension_add_method('display', 'xrender_create_radial_gradient', create_radial_gradient)
+    disp.extension_add_method('display', 'xrender_create_conical_gradient', create_conical_gradient)
 

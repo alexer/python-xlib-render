@@ -22,7 +22,7 @@ PictTypeIndexed = 0
 PictTypeDirect = 1
 
 def render_find_format(dpy, **kwargs):
-	res = dpy.render_query_pict_formats()
+	res = dpy.xrender_query_pict_formats()
 	matches = []
 	for item in res.formats:
 		for key, value in kwargs.iteritems():

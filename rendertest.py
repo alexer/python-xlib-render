@@ -33,7 +33,7 @@ def generate_cursor(win):
 		pixels = ''.join(color + ('\x7f' if x == y else '\xff') if x >= y else '\x00\x00\x00\x00' for y in range(height) for x in range(width))
 		pixmap = win.create_pixmap(width, height, depth)
 		pixmap.put_image(gc, 0, 0, width, height, X.ZPixmap, depth, 0, pixels)
-		pict = pixmap.create_picture(fmt_argb32)
+		pict = pixmap.xrender_create_picture(fmt_argb32)
 		pixmap.free()
 		# OP 27, CreateCursor
 		cursor = pict.create_cursor(0, 0)
@@ -41,7 +41,7 @@ def generate_cursor(win):
 		pict.free()
 	gc.free()
 	# OP 31, CreateAnimCursor
-	cursor = dpy.create_anim_cursor(cursors)
+	cursor = dpy.xrender_create_anim_cursor(cursors)
 
 	return cursor
 
@@ -56,11 +56,11 @@ root = scr.root
 assert dpy.has_extension('RENDER')
 
 # OP 0, QueryVersion
-res = dpy.render_query_version()
+res = dpy.xrender_query_version()
 print 'XRender version:', res.major_version, res.minor_version
 
 # OP 1, QueryPictFormats
-res = dpy.render_query_pict_formats()
+res = dpy.xrender_query_pict_formats()
 
 depths = visuals = 0
 print 'Formats:'
@@ -102,7 +102,7 @@ glyphids = range(32, 127)
 glyphs = generate_glyphs(glyphids)
 
 # OP 17, CreateGlyphSet
-font_ = dpy.create_glyph_set(fmt_a8)
+font_ = dpy.xrender_create_glyph_set(fmt_a8)
 # OP 20, AddGlyphs
 font_.add_glyphs(*glyphs)
 # OP 18, ReferenceGlyphSet
@@ -113,7 +113,7 @@ cursor = generate_cursor(win)
 win.change_attributes(cursor = cursor)
 
 # OP 4, CreatePicture
-pict = win.create_picture(fmt_argb32)
+pict = win.xrender_create_picture(fmt_argb32)
 
 red = (65535, 0, 0, 65535)
 green = (0, 65535, 0, 65535)
@@ -122,28 +122,28 @@ stops = [(0, red), (0.5, green), (1, blue)]
 
 gradients = [
 	# OP 33, CreateSolidFill
-	dpy.create_solid_fill(green),
+	dpy.xrender_create_solid_fill(green),
 	# OP 34, CreateLinearGradient
-	dpy.create_linear_gradient((0, 0), (50, 50), *stops),
+	dpy.xrender_create_linear_gradient((0, 0), (50, 50), *stops),
 	# OP 35, CreateRadialGradient
-	dpy.create_radial_gradient((40, 5), (40, 5), 0, 40, *stops),
+	dpy.xrender_create_radial_gradient((40, 5), (40, 5), 0, 40, *stops),
 	# OP 36, CreateConicalGradient
-	dpy.create_conical_gradient((40, 5), 180, *stops),
+	dpy.xrender_create_conical_gradient((40, 5), 180, *stops),
 ]
-hue = dpy.create_conical_gradient((50, 50), 0, (0/6., (65535, 0, 0, 65535)), (1/6., (65535, 0, 65535, 65535)), (2/6., (0, 0, 65535, 65535)), (3/6., (0, 65535, 65535, 65535)), (4/6., (0, 65535, 0, 65535)), (5/6., (65535, 65535, 0, 65535)), (6/6., (65535, 0, 0, 65535)))
+hue = dpy.xrender_create_conical_gradient((50, 50), 0, (0/6., (65535, 0, 0, 65535)), (1/6., (65535, 0, 65535, 65535)), (2/6., (0, 0, 65535, 65535)), (3/6., (0, 65535, 65535, 65535)), (4/6., (0, 65535, 0, 65535)), (5/6., (65535, 65535, 0, 65535)), (6/6., (65535, 0, 0, 65535)))
 
 pixmap = win.create_pixmap(100, 100, 32)
-img = pixmap.create_picture(fmt_argb32)
+img = pixmap.xrender_create_picture(fmt_argb32)
 # OP 29, QueryFilters
-res = pixmap.render_query_filters()
+res = pixmap.xrender_query_filters()
 pixmap.free()
 
 pixmap = win.create_pixmap(100, 100, 32)
-img2 = pixmap.create_picture(fmt_argb32)
+img2 = pixmap.xrender_create_picture(fmt_argb32)
 pixmap.free()
 
 pixmap = win.create_pixmap(100, 100, 8)
-mask = pixmap.create_picture(fmt_a8)
+mask = pixmap.xrender_create_picture(fmt_a8)
 pixmap.free()
 
 mask.fill_rectangles(0, (0, 0, 0, 0), (0, 0, 100, 100))
