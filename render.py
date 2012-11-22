@@ -190,7 +190,7 @@ PictDepth = rq.Struct(
     rq.Pad(4),
     rq.List('visuals', PictVisual)
     )
-# XXX
+# The spec fails to mention the fallback field
 PictScreen = rq.Struct(
     rq.LengthOf('depths', 4),
     PictFormat('fallback'),
