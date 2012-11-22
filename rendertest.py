@@ -165,7 +165,7 @@ img2.change(clip_mask = X.NONE)
 img2.composite(3, hue, mask, 20, 20, 0, 0, 0, 0, 60, 60)
 
 # OP 28, SetPictureTransform
-mask.set_transform((1, 0.2, 0, 0, 1, 0, 0, 0, 1))
+mask.set_transform((1, 0.2, 0, -0.2, 1, 0, 0, 0, 1))
 # OP 30, SetPictureFilter
 mask.set_filter('good')
 

@@ -109,8 +109,7 @@ RepeatPad = 2
 RepeatReflect = 3
 
 
-# XXX: Int32
-class Fixed(rq.Card32):
+class Fixed(rq.Int32):
     def check_value(self, value):
         return int(value*2**16)
 
